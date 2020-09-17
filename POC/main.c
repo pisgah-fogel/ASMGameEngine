@@ -34,6 +34,18 @@ int main()
                 case SDL_QUIT:
                     close = 1;
                     break;
+                case SDL_KEYDOWN: 
+                    switch (event.key.keysym.scancode) { 
+                        case SDL_SCANCODE_A: 
+                        case SDL_SCANCODE_LEFT: 
+                            dest.x -= speed; 
+                            break; 
+                        case SDL_SCANCODE_D: 
+                        case SDL_SCANCODE_RIGHT: 
+                            dest.x += speed; 
+                            break; 
+                    }
+                    break;
             }
         }
 
