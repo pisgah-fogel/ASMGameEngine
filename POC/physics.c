@@ -3,8 +3,50 @@
 #include <SDL2/SDL_timer.h>
 #include <chipmunk/chipmunk.h>
 
+void DrawCircle(SDL_Renderer * renderer, int32_t centreX, int32_t centreY, int32_t radius)
+{
+   const int32_t diameter = (radius * 2);
+
+   int32_t x = (radius - 1);
+   int32_t y = 0;
+   int32_t tx = 1;
+   int32_t ty = 1;
+   int32_t error = (tx - diameter);
+
+   while (x >= y)
+   {
+      //  Each of the following renders an octant of the circle
+      SDL_RenderDrawPoint(renderer, centreX + x, centreY - y);
+      SDL_RenderDrawPoint(renderer, centreX + x, centreY + y);
+      SDL_RenderDrawPoint(renderer, centreX - x, centreY - y);
+      SDL_RenderDrawPoint(renderer, centreX - x, centreY + y);
+      SDL_RenderDrawPoint(renderer, centreX + y, centreY - x);
+      SDL_RenderDrawPoint(renderer, centreX + y, centreY + x);
+      SDL_RenderDrawPoint(renderer, centreX - y, centreY - x);
+      SDL_RenderDrawPoint(renderer, centreX - y, centreY + x);
+
+      if (error <= 0)
+      {
+         ++y;
+         error += ty;
+         ty += 2;
+      }
+
+      if (error > 0)
+      {
+         --x;
+         tx += 2;
+         error += (tx - diameter);
+      }
+   }
+}
+
+static inline float real_to_size(cpFloat v) {
+    return v*50;
+}
+
 static inline cpVect real_to_pix(cpVect real) {
-    return cpv(10*real.x, 200-10*real.y);
+    return cpv(300+50*real.x, 500-50*real.y);
 }
 
 static inline float real_to_sprite_rot(cpFloat rot) {
@@ -31,14 +73,17 @@ int main()
     cpShapeSetFriction(ground, 1);
     cpSpaceAddShape(space, ground);
 
-    // TODO: create a box
-    // cpPolyShape *cpBoxShapeInit(cpPolyShape *poly, cpBody *body, cpFloat width, cpFloat height, cpFloat radius)
-
-
-    // create a ball
-    cpFloat radius = 5;
+    // Commun to physic objects
+    cpFloat radius = 1;
     cpFloat mass = 1;
     cpFloat moment = cpMomentForCircle(mass, 0, radius, cpvzero); // inertia
+
+    // TODO: create a box
+    cpBody *boxBody = cpSpaceAddBody(space, cpBodyNew(mass, moment));
+    cpBodySetPos(boxBody, cpv(0, 25));
+    cpShape *boxShape = cpSpaceAddShape(space, cpBoxShapeNew(boxBody, 5.f, 5.f));
+
+    // create a ball
     cpBody *ballBody = cpSpaceAddBody(space, cpBodyNew(mass, moment));
     cpBodySetPos(ballBody, cpv(0, 15));
     cpShape *ballShape = cpSpaceAddShape(space, cpCircleShapeNew(ballBody, radius, cpvzero)); // collisin shape attached to the body
@@ -93,11 +138,13 @@ int main()
         SDL_RenderClear(rend);
 
         // Render Texture
+        SDL_SetRenderDrawColor( rend, 0x00, 0x00, 0x00, 0xFF );   
         cpVect pos = real_to_pix(cpBodyGetPos(ballBody));
         dest.x = pos.x; dest.y = pos.y;
         cpSpaceStep(space, timeStep);
         cpFloat rot = cpBodyGetAngle(ballBody);
         SDL_RenderCopyEx(rend, tex, NULL, &dest, real_to_sprite_rot(rot), NULL, SDL_FLIP_NONE);
+        DrawCircle(rend, dest.x, dest.y, real_to_size(radius));
 
         // Clip rendering (sprite sheet)
         SDL_Rect srcRect = { 0, 0, 50, 50 };
@@ -105,7 +152,8 @@ int main()
         SDL_RenderCopy(rend, tex, &srcRect, &destRect);
 
         // Fill rect
-        SDL_Rect fillRect = { 10, 10, 50, 50};
+        cpVect posRec = real_to_pix(cpBodyGetPos(boxBody));
+        SDL_Rect fillRect = { posRec.x-real_to_size(2.5), posRec.y-real_to_size(2.5), real_to_size(5.0), real_to_size(5.0)};
         SDL_SetRenderDrawColor( rend, 0xFF, 0x00, 0x00, 0xFF );        
         SDL_RenderFillRect( rend, &fillRect );
 
@@ -131,6 +179,8 @@ int main()
     // clean up physics objects
     cpShapeFree(ballShape);
     cpBodyFree(ballBody);
+    cpShapeFree(boxShape);
+    cpBodyFree(boxBody);
     cpShapeFree(ground);
     cpSpaceFree(space);
 
