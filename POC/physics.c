@@ -3,8 +3,12 @@
 #include <SDL2/SDL_timer.h>
 #include <chipmunk/chipmunk.h>
 
-cpVect real_to_pix(cpVect real) {
+static inline cpVect real_to_pix(cpVect real) {
     return cpv(10*real.x, 200-10*real.y);
+}
+
+static inline float real_to_sprite_rot(cpFloat rot) {
+    return -rot*180/3.14;
 }
 
 int main() 
@@ -93,7 +97,7 @@ int main()
         dest.x = pos.x; dest.y = pos.y;
         cpSpaceStep(space, timeStep);
         cpFloat rot = cpBodyGetAngle(ballBody);
-        SDL_RenderCopyEx(rend, tex, NULL, &dest, -rot*180/3.14, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(rend, tex, NULL, &dest, real_to_sprite_rot(rot), NULL, SDL_FLIP_NONE);
 
         // Clip rendering (sprite sheet)
         SDL_Rect srcRect = { 0, 0, 50, 50 };
@@ -106,13 +110,15 @@ int main()
         SDL_RenderFillRect( rend, &fillRect );
 
         // Wired rect
-        SDL_Rect outlineRect = { 15, 15, 100, 50};
+        SDL_Rect outlineRect = { 300, 300, 200, 10};
         SDL_SetRenderDrawColor( rend, 0x00, 0xFF, 0x00, 0xFF );        
         SDL_RenderDrawRect( rend, &outlineRect );
 
         // Line
+        cpVect groundPos1 = real_to_pix(cpv(-20, 0));
+        cpVect groundPos2 = real_to_pix(cpv(20, -5));
         SDL_SetRenderDrawColor( rend, 0x00, 0x00, 0xFF, 0xFF );        
-        SDL_RenderDrawLine( rend, 0, 0, 500, 500 );
+        SDL_RenderDrawLine( rend, groundPos1.x, groundPos1.y, groundPos2.x, groundPos2.y );
 
         // Point
         SDL_RenderDrawPoint( rend, 550, 550 );
