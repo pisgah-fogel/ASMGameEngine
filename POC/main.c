@@ -17,6 +17,10 @@ int main()
     SDL_Texture* tex = SDL_CreateTextureFromSurface(rend, surface);
     SDL_FreeSurface(surface);
     SDL_Rect dest;
+
+    // Texture color modulation
+    SDL_SetTextureColorMod( tex, 0, 127, 0 );
+
     SDL_QueryTexture(tex, NULL, NULL, &dest.w, &dest.h);
     dest.w *= 3; 
     dest.h *= 3; 
