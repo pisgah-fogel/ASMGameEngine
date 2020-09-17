@@ -24,7 +24,7 @@ int main()
     dest.y = (1000 - dest.h) / 2;
 
     int close = 0;
-    int speed = 300;
+    int speed = 10;
 
 
     while (!close) {
@@ -50,7 +50,28 @@ int main()
         }
 
         SDL_RenderClear(rend);
+
+        // Texture
         SDL_RenderCopy(rend, tex, NULL, &dest);
+
+        // Fill rect
+        SDL_Rect fillRect = { 10, 10, 100, 50};
+        SDL_SetRenderDrawColor( rend, 0xFF, 0x00, 0x00, 0xFF );        
+        SDL_RenderFillRect( rend, &fillRect );
+
+        // Wired rect
+        SDL_Rect outlineRect = { 15, 15, 100, 50};
+        SDL_SetRenderDrawColor( rend, 0x00, 0xFF, 0x00, 0xFF );        
+        SDL_RenderDrawRect( rend, &outlineRect );
+
+        // Line
+        SDL_SetRenderDrawColor( rend, 0x00, 0x00, 0xFF, 0xFF );        
+        SDL_RenderDrawLine( rend, 0, 0, 500, 500 );
+
+        // Point
+        SDL_RenderDrawPoint( rend, 550, 550 );
+
+        SDL_SetRenderDrawColor( rend, 0xFF, 0xFF, 0xFF, 0xFF );
         SDL_RenderPresent(rend);
         SDL_Delay(1000 / 60);
     }
