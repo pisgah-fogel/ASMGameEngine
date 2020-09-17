@@ -46,7 +46,7 @@ static inline float real_to_size(cpFloat v) {
 }
 
 static inline cpVect real_to_pix(cpVect real) {
-    return cpv(300+50*real.x, 500-50*real.y);
+    return cpv(300+50*real.x, 800-50*real.y);
 }
 
 static inline float real_to_sprite_rot(cpFloat rot) {
@@ -69,7 +69,7 @@ int main()
     cpSpaceSetGravity(space, gravity);
 
     // Create a ground
-    cpShape *ground = cpSegmentShapeNew(cpSpaceGetStaticBody(space), cpv(-20, 0), cpv(20, -5), 0);
+    cpShape *ground = cpSegmentShapeNew(cpSpaceGetStaticBody(space), cpv(-20, 5), cpv(20, -5), 0);
     cpShapeSetFriction(ground, 1);
     cpSpaceAddShape(space, ground);
 
@@ -78,7 +78,6 @@ int main()
     cpFloat mass = 1;
     cpFloat moment = cpMomentForCircle(mass, 0, radius, cpvzero); // inertia
 
-    // TODO: create a box
     cpBody *boxBody = cpSpaceAddBody(space, cpBodyNew(mass, moment));
     cpBodySetPos(boxBody, cpv(0, 25));
     cpShape *boxShape = cpSpaceAddShape(space, cpBoxShapeNew(boxBody, 5.f, 5.f));
@@ -91,23 +90,33 @@ int main()
     cpFloat timeStep = 1.0/60.0; // time step for the simulation
 
     SDL_Renderer* rend = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); 
+    
+    SDL_Surface* windowSurface = SDL_GetWindowSurface( win );
+    SDL_Texture *boxTex = SDL_CreateTexture(rend, windowSurface->format->format, SDL_TEXTUREACCESS_TARGET, 200, 200);
+    SDL_SetRenderTarget(rend, boxTex);
+    SDL_SetRenderDrawColor(rend, 0x00, 0x00, 0x00, 0x00);
+    SDL_RenderClear(rend);
+    SDL_Rect fillRect = { 0, 0, real_to_size(5.0), real_to_size(5.0)};
+    SDL_Point centerRect = {real_to_size(2.5), real_to_size(2.5)};
+    SDL_SetRenderDrawColor( rend, 0xFF, 0x00, 0x00, 0xFF );        
+    SDL_RenderFillRect( rend, &fillRect );
+    SDL_SetRenderTarget(rend, NULL);
+
+    SDL_FreeSurface(windowSurface); // TODO: Do I need to free this ?
+    
     SDL_Surface* surface = IMG_Load("hand_open.png");
     SDL_Texture* tex = SDL_CreateTextureFromSurface(rend, surface);
     SDL_FreeSurface(surface);
     SDL_Rect dest;
+    SDL_QueryTexture(tex, NULL, NULL, &dest.w, &dest.h);
+    SDL_Point centerImg = {dest.w/2, dest.h/2};
 
     // Texture color modulation
-    SDL_SetTextureColorMod( tex, 0, 255, 0 );
+    //SDL_SetTextureColorMod( tex, 0, 255, 0 );
 
     // Alpha blending
-    SDL_SetTextureBlendMode( tex, SDL_BLENDMODE_BLEND );
-    SDL_SetTextureAlphaMod( tex, 127 );
-
-    SDL_QueryTexture(tex, NULL, NULL, &dest.w, &dest.h);
-    dest.w *= 1; 
-    dest.h *= 1; 
-    dest.x = (1000 - dest.w) / 2;
-    dest.y = (1000 - dest.h) / 2;
+    //SDL_SetTextureBlendMode( tex, SDL_BLENDMODE_BLEND );
+    //SDL_SetTextureAlphaMod( tex, 127 );
 
     int close = 0;
     int speed = 10;
@@ -137,14 +146,17 @@ int main()
 
         SDL_RenderClear(rend);
 
+        cpSpaceStep(space, timeStep); // process physics
+
         // Render Texture
         SDL_SetRenderDrawColor( rend, 0x00, 0x00, 0x00, 0xFF );   
         cpVect pos = real_to_pix(cpBodyGetPos(ballBody));
-        dest.x = pos.x; dest.y = pos.y;
-        cpSpaceStep(space, timeStep);
+        dest.x = pos.x - centerImg.x;
+        dest.y = pos.y - centerImg.y;
+        SDL_Rect circlePos = {pos.x, pos.y};
         cpFloat rot = cpBodyGetAngle(ballBody);
-        SDL_RenderCopyEx(rend, tex, NULL, &dest, real_to_sprite_rot(rot), NULL, SDL_FLIP_NONE);
-        DrawCircle(rend, dest.x, dest.y, real_to_size(radius));
+        SDL_RenderCopyEx(rend, tex, NULL, &dest, real_to_sprite_rot(rot), &centerImg, SDL_FLIP_NONE);
+        DrawCircle(rend, pos.x, pos.y, real_to_size(radius));
 
         // Clip rendering (sprite sheet)
         SDL_Rect srcRect = { 0, 0, 50, 50 };
@@ -153,17 +165,16 @@ int main()
 
         // Fill rect
         cpVect posRec = real_to_pix(cpBodyGetPos(boxBody));
-        SDL_Rect fillRect = { posRec.x-real_to_size(2.5), posRec.y-real_to_size(2.5), real_to_size(5.0), real_to_size(5.0)};
-        SDL_SetRenderDrawColor( rend, 0xFF, 0x00, 0x00, 0xFF );        
-        SDL_RenderFillRect( rend, &fillRect );
+        SDL_Rect destRec = { posRec.x-centerRect.x, posRec.y-centerRect.y, 200, 200 };
+        cpFloat rotRec = cpBodyGetAngle(boxBody);
+        SDL_RenderCopyEx(rend, boxTex, NULL, &destRec, real_to_sprite_rot(rotRec), &centerRect, SDL_FLIP_NONE);
 
         // Wired rect
-        SDL_Rect outlineRect = { 300, 300, 200, 10};
-        SDL_SetRenderDrawColor( rend, 0x00, 0xFF, 0x00, 0xFF );        
-        SDL_RenderDrawRect( rend, &outlineRect );
+        //SDL_SetRenderDrawColor( rend, 0x00, 0xFF, 0x00, 0xFF );        
+        //SDL_RenderDrawRect( rend, &destRec );
 
         // Line
-        cpVect groundPos1 = real_to_pix(cpv(-20, 0));
+        cpVect groundPos1 = real_to_pix(cpv(-20, 5));
         cpVect groundPos2 = real_to_pix(cpv(20, -5));
         SDL_SetRenderDrawColor( rend, 0x00, 0x00, 0xFF, 0xFF );        
         SDL_RenderDrawLine( rend, groundPos1.x, groundPos1.y, groundPos2.x, groundPos2.y );
@@ -184,6 +195,7 @@ int main()
     cpShapeFree(ground);
     cpSpaceFree(space);
 
+    SDL_DestroyTexture(boxTex);
     SDL_DestroyTexture(tex);
     SDL_DestroyRenderer(rend);
     SDL_DestroyWindow(win);
