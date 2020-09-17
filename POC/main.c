@@ -54,6 +54,11 @@ int main()
         // Texture
         SDL_RenderCopy(rend, tex, NULL, &dest);
 
+        // Clip rendering (sprite sheet)
+        SDL_Rect srcRect = { 0, 0, 50, 50 };
+        SDL_Rect destRect = { 100, 100, 100, 100 };
+        SDL_RenderCopy(rend, tex, &srcRect, &destRect);
+
         // Fill rect
         SDL_Rect fillRect = { 10, 10, 100, 50};
         SDL_SetRenderDrawColor( rend, 0xFF, 0x00, 0x00, 0xFF );        
@@ -71,7 +76,7 @@ int main()
         // Point
         SDL_RenderDrawPoint( rend, 550, 550 );
 
-        SDL_SetRenderDrawColor( rend, 0xFF, 0xFF, 0xFF, 0xFF );
+        SDL_SetRenderDrawColor( rend, 0xFF, 0x3F, 0xFF, 0xFF );
         SDL_RenderPresent(rend);
         SDL_Delay(1000 / 60);
     }
