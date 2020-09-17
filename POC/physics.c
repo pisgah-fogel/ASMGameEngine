@@ -27,12 +27,15 @@ int main()
     cpShapeSetFriction(ground, 1);
     cpSpaceAddShape(space, ground);
 
+    // TODO: create a box
+    // cpPolyShape *cpBoxShapeInit(cpPolyShape *poly, cpBody *body, cpFloat width, cpFloat height, cpFloat radius)
+
+
     // create a ball
     cpFloat radius = 5;
     cpFloat mass = 1;
     cpFloat moment = cpMomentForCircle(mass, 0, radius, cpvzero); // inertia
     cpBody *ballBody = cpSpaceAddBody(space, cpBodyNew(mass, moment));
-    
     cpBodySetPos(ballBody, cpv(0, 15));
     cpShape *ballShape = cpSpaceAddShape(space, cpCircleShapeNew(ballBody, radius, cpvzero)); // collisin shape attached to the body
     cpShapeSetFriction(ballShape, 0.7);
@@ -52,8 +55,8 @@ int main()
     SDL_SetTextureAlphaMod( tex, 127 );
 
     SDL_QueryTexture(tex, NULL, NULL, &dest.w, &dest.h);
-    dest.w *= 3; 
-    dest.h *= 3; 
+    dest.w *= 1; 
+    dest.h *= 1; 
     dest.x = (1000 - dest.w) / 2;
     dest.y = (1000 - dest.h) / 2;
 
@@ -72,11 +75,11 @@ int main()
                     switch (event.key.keysym.scancode) { 
                         case SDL_SCANCODE_A: 
                         case SDL_SCANCODE_LEFT: 
-                            dest.x -= speed; 
+                            //dest.x -= speed; 
                             break; 
                         case SDL_SCANCODE_D: 
                         case SDL_SCANCODE_RIGHT: 
-                            dest.x += speed; 
+                            //dest.x += speed; 
                             break; 
                     }
                     break;
@@ -85,8 +88,12 @@ int main()
 
         SDL_RenderClear(rend);
 
-        // Texture
-        SDL_RenderCopy(rend, tex, NULL, &dest);
+        // Render Texture
+        cpVect pos = real_to_pix(cpBodyGetPos(ballBody));
+        dest.x = pos.x; dest.y = pos.y;
+        cpSpaceStep(space, timeStep);
+        cpFloat rot = cpBodyGetAngle(ballBody);
+        SDL_RenderCopyEx(rend, tex, NULL, &dest, -rot*180/3.14, NULL, SDL_FLIP_NONE);
 
         // Clip rendering (sprite sheet)
         SDL_Rect srcRect = { 0, 0, 50, 50 };
@@ -94,11 +101,7 @@ int main()
         SDL_RenderCopy(rend, tex, &srcRect, &destRect);
 
         // Fill rect
-        cpVect pos = real_to_pix(cpBodyGetPos(ballBody));
-        cpSpaceStep(space, timeStep);
-        cpFloat rot = cpBodyGetAngle(ballBody);
-        printf("Rotation %f rad\n", rot);
-        SDL_Rect fillRect = { pos.x, pos.y, 50, 50};
+        SDL_Rect fillRect = { 10, 10, 50, 50};
         SDL_SetRenderDrawColor( rend, 0xFF, 0x00, 0x00, 0xFF );        
         SDL_RenderFillRect( rend, &fillRect );
 
@@ -114,7 +117,7 @@ int main()
         // Point
         SDL_RenderDrawPoint( rend, 550, 550 );
 
-        SDL_SetRenderDrawColor( rend, 0xFF, 0x3F, 0xFF, 0xFF );
+        SDL_SetRenderDrawColor( rend, 0xFF, 0xFF, 0xFF, 0xFF );
         SDL_RenderPresent(rend);
         SDL_Delay(1000 / 60);
     }
