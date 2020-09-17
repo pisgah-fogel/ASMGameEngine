@@ -12,14 +12,18 @@ int main()
         SDL_WINDOWPOS_CENTERED, 
         1000, 1000, 0);
 
-    SDL_Renderer* rend = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED); 
+    SDL_Renderer* rend = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); 
     SDL_Surface* surface = IMG_Load("hand_open.png");
     SDL_Texture* tex = SDL_CreateTextureFromSurface(rend, surface);
     SDL_FreeSurface(surface);
     SDL_Rect dest;
 
     // Texture color modulation
-    SDL_SetTextureColorMod( tex, 0, 127, 0 );
+    SDL_SetTextureColorMod( tex, 0, 255, 0 );
+
+    // Alpha blending
+    SDL_SetTextureBlendMode( tex, SDL_BLENDMODE_BLEND );
+    SDL_SetTextureAlphaMod( tex, 127 );
 
     SDL_QueryTexture(tex, NULL, NULL, &dest.w, &dest.h);
     dest.w *= 3; 
