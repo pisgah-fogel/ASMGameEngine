@@ -52,4 +52,9 @@ Or a VS Code plugin ? (If I can manage to integrate TileMap editor, animations e
 - make
 - if you get "error: unknown type name 'ptrdiff_t'", add #include <stddef.h> to demo\sokol\sokol_app.h
 -  Copy C:\Chipmunk\src\libchipmunk.dll next to the executable
--  
+
+### Visual Studio Code setup
+- Append to settings.json:
+  ```
+  "C_Cpp.default.includePath": ["C:\\SDL2\\i686-w64-mingw32\\include", "C:\\Chipmunk\\include"]
+  ```
