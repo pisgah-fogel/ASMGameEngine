@@ -2,6 +2,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
 #include <chipmunk/chipmunk.h>
+#include <stdio.h>
 
 void DrawCircle(SDL_Renderer * renderer, int32_t centreX, int32_t centreY, int32_t radius)
 {
@@ -53,7 +54,7 @@ static inline float real_to_sprite_rot(cpFloat rot) {
     return -rot*180/3.14;
 }
 
-int main() 
+int main(int argc, char** argv) 
 { 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { 
         printf("Error initializing SDL: %s\n", SDL_GetError()); 
@@ -79,12 +80,12 @@ int main()
     cpFloat moment = cpMomentForCircle(mass, 0, radius, cpvzero); // inertia
 
     cpBody *boxBody = cpSpaceAddBody(space, cpBodyNew(mass, moment));
-    cpBodySetPos(boxBody, cpv(0, 25));
-    cpShape *boxShape = cpSpaceAddShape(space, cpBoxShapeNew(boxBody, 5.f, 5.f));
+    cpBodySetPosition(boxBody, cpv(0, 25));
+    cpShape *boxShape = cpSpaceAddShape(space, cpBoxShapeNew(boxBody, 5.f, 5.f, 0.f));
 
     // create a ball
     cpBody *ballBody = cpSpaceAddBody(space, cpBodyNew(mass, moment));
-    cpBodySetPos(ballBody, cpv(0, 15));
+    cpBodySetPosition(ballBody, cpv(0, 15));
     cpShape *ballShape = cpSpaceAddShape(space, cpCircleShapeNew(ballBody, radius, cpvzero)); // collisin shape attached to the body
     cpShapeSetFriction(ballShape, 0.7);
     cpFloat timeStep = 1.0/60.0; // time step for the simulation
@@ -150,7 +151,7 @@ int main()
 
         // Render Texture
         SDL_SetRenderDrawColor( rend, 0x00, 0x00, 0x00, 0xFF );   
-        cpVect pos = real_to_pix(cpBodyGetPos(ballBody));
+        cpVect pos = real_to_pix(cpBodyGetPosition(ballBody));
         dest.x = pos.x - centerImg.x;
         dest.y = pos.y - centerImg.y;
         SDL_Rect circlePos = {pos.x, pos.y};
@@ -164,7 +165,7 @@ int main()
         SDL_RenderCopy(rend, tex, &srcRect, &destRect);
 
         // Fill rect
-        cpVect posRec = real_to_pix(cpBodyGetPos(boxBody));
+        cpVect posRec = real_to_pix(cpBodyGetPosition(boxBody));
         SDL_Rect destRec = { posRec.x-centerRect.x, posRec.y-centerRect.y, 200, 200 };
         cpFloat rotRec = cpBodyGetAngle(boxBody);
         SDL_RenderCopyEx(rend, boxTex, NULL, &destRec, real_to_sprite_rot(rotRec), &centerRect, SDL_FLIP_NONE);

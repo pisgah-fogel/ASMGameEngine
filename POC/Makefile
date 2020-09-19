@@ -1,9 +1,13 @@
+SOURCES = physics.c
 SDL_LINKER_OPT = -lSDL2main -lSDL2 -lSDL2_image
+CHIPMUNK_LINKER_OPT = -lchipmunk
 ifeq ($(OS),Windows_NT)
-	SDL_INCLUDE = C:\SDL2\i686-w64-mingw32\include
-	SDL_LIB = C:\SDL2\i686-w64-mingw32\lib
-	MINGW_LIB = C:\MinGW\lib
-	LIB_OPTION = -L${SDL_LIB} -L${MINGW_LIB}
+	SDL_INCLUDE = "C:/SDL2/i686-w64-mingw32/include"
+	SDL_LIB = -L"C:/SDL2/i686-w64-mingw32/lib"
+	GCC_LIB = -L"C:/MinGW/lib"
+    CHIPMUNK_LIB = -L"C:/Chipmunk/src"
+    CHIPMUNK_INCLUDE = "C:/Chipmunk/include"
+    SYSTEM_OPT = -w -Wl,-subsystem,windows -lmingw32
     CCFLAGS += -D WIN32
     ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
         CCFLAGS += -D AMD64
@@ -17,6 +21,7 @@ ifeq ($(OS),Windows_NT)
     endif
 else
 	SDL_INCLUDE = /usr/include/SDL2
+    CHIPMUNK_INCLUDE = /usr/include/chipmunk
     UNAME_S := $(shell uname -s)
     ifeq ($(UNAME_S),Linux)
         CCFLAGS += -D LINUX
@@ -37,9 +42,7 @@ else
 endif
 
 all:
-	gcc main.c -I${SDL_INCLUDE} ${SDL_LINKER_OPT} -o test1
-	gcc physics.c -I${SDL_INCLUDE} -I/usr/include/chipmunk ${SDL_LINKER_OPT} -lchipmunk -o test2
+	gcc ${SOURCES} -I${SDL_INCLUDE} -I${CHIPMUNK_INCLUDE} ${SDL_LIB} ${GCC_LIB} ${CHIPMUNK_LIB} ${SYSTEM_OPT} ${SDL_LINKER_OPT} ${CHIPMUNK_LINKER_OPT} -o debug
+
 clean:
-	rm -f test1 test2 test3
-windows:
-	g++ main.c -I${SDL_INCLUDE} ${LIB_OPTION} -w -Wl,-subsystem,windows -lmingw32 ${SDL_LINKER_OPT} -o test1
+	rm -f debug

@@ -30,3 +30,26 @@ Or a VS Code plugin ? (If I can manage to integrate TileMap editor, animations e
 - SDL tutorial: http://www.lazyfoo.net/tutorials/SDL/index.php#Geometry%20Rendering
 - Chipmunk2D github: https://github.com/slembcke/Chipmunk2D
 - Chipmunk2D example: https://chipmunk-physics.net/release/ChipmunkLatest-Docs/
+
+## Develop on Windows:
+### MinGW32
+- Get mingw-get-setup.exe there: https://osdn.net/projects/mingw/
+- Install MinGW at C:\MinGW (Check C:\MinGW\lib)
+- Add Mingw bin directory to your PATH environment variable
+
+### SDL2 for Windows-MinGW30
+- Download SDL2 there: https://www.libsdl.org/download-2.0.php
+- Download SDL2_image there: https://www.libsdl.org/projects/SDL_image/
+- Copy SDL2 and SDL2_img in C:\SDL2 (Check C:\SDL2\i686-w64-mingw32\lib and C:\SDL2\i686-w64-mingw32\include)
+- Copy all .DLL from C:\SDL2\i686-w64-mingw32\bin to the direcotry where the game's executable.
+
+### Chipmunk from source
+- Download CMake and install it: https://cmake.org/download/
+- Dowmload Chipmunk there: https://chipmunk-physics.net/release/ChipmunkLatest.tgz
+- Copy Chipmunk C:\Chipmunk (Check ????)
+- cmake -G "MinGW Makefiles" .
+- If it complains about sh.exe being in your path, just rename it sh.exe.old
+- make
+- if you get "error: unknown type name 'ptrdiff_t'", add #include <stddef.h> to demo\sokol\sokol_app.h
+-  Copy C:\Chipmunk\src\libchipmunk.dll next to the executable
+-  
