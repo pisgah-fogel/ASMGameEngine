@@ -102,8 +102,6 @@ int main(int argc, char** argv)
     SDL_SetRenderDrawColor( rend, 0xFF, 0x00, 0x00, 0xFF );        
     SDL_RenderFillRect( rend, &fillRect );
     SDL_SetRenderTarget(rend, NULL);
-
-    SDL_FreeSurface(windowSurface); // TODO: Do I need to free this ?
     
     SDL_Surface* surface = IMG_Load("hand_open.png");
     SDL_Texture* tex = SDL_CreateTextureFromSurface(rend, surface);
