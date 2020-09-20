@@ -116,6 +116,16 @@ void UpdateDrawFrame()
         
         DrawText("Everythings' working fine so far...", 190, 200, 20, LIGHTGRAY);
 
+        DrawText(TextFormat("DETECTED AXIS [%i]:", GetGamepadAxisCount(GAMEPAD_PLAYER1)), 10, 50, 10, MAROON);
+
+        for (int i = 0; i < GetGamepadAxisCount(GAMEPAD_PLAYER1); i++)
+        {
+            DrawText(TextFormat("AXIS %i: %.02f", i, GetGamepadAxisMovement(GAMEPAD_PLAYER1, i)), 20, 70 + 20*i, 10, DARKGRAY);
+        }
+
+        if (GetGamepadButtonPressed() != -1) DrawText(TextFormat("DETECTED BUTTON: %i", GetGamepadButtonPressed()), 10, 430, 10, RED);
+        else DrawText("DETECTED BUTTON: NONE", 10, 430, 10, GRAY);
+
         DrawCircleV(cursorPosition, 40, cursorColor);
 
     EndDrawing();
