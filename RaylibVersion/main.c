@@ -86,6 +86,9 @@ int main()
     return 0;
 }
 
+Vector2 cursorPosition = { -100.0f, -100.0f };
+Color cursorColor = DARKBLUE;
+
 void UpdateDrawFrame()
 {
     // Handle Events
@@ -93,6 +96,10 @@ void UpdateDrawFrame()
     if (IsKeyDown(KEY_LEFT)) texture_test->dest.x -= 2.0f;
     if (IsKeyDown(KEY_UP)) texture_test->dest.y -= 2.0f;
     if (IsKeyDown(KEY_DOWN)) texture_test->dest.y += 2.0f;
+    cursorPosition = GetMousePosition();
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) cursorColor = MAROON;
+    else if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) cursorColor = LIME;
+    else if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) cursorColor = DARKBLUE;
 
     // TODO: call _process on each node
     texture_test->rotation++;
@@ -108,6 +115,8 @@ void UpdateDrawFrame()
         DrawLine(0, (int)texture_test->dest.y, screenWidth, (int)texture_test->dest.y, GRAY);
         
         DrawText("Everythings' working fine so far...", 190, 200, 20, LIGHTGRAY);
+
+        DrawCircleV(cursorPosition, 40, cursorColor);
 
     EndDrawing();
 }
