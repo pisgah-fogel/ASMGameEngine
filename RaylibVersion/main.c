@@ -88,6 +88,12 @@ int main()
 
 void UpdateDrawFrame()
 {
+    // Handle Events
+    if (IsKeyDown(KEY_RIGHT)) texture_test->dest.x += 2.0f;
+    if (IsKeyDown(KEY_LEFT)) texture_test->dest.x -= 2.0f;
+    if (IsKeyDown(KEY_UP)) texture_test->dest.y -= 2.0f;
+    if (IsKeyDown(KEY_DOWN)) texture_test->dest.y += 2.0f;
+
     // TODO: call _process on each node
     texture_test->rotation++;
 
