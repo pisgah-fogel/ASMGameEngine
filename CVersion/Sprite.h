@@ -16,7 +16,7 @@ struct Sprite
 
 struct Sprite* initSprite(SDL_Renderer* renderer)
 {
-    SDL_Surface* surface = IMG_Load("test1.png");
+    SDL_Surface* surface = IMG_Load("assets/spritesheet.png");
 #ifdef ERROR_HANDLING
     if (surface == NULL) {
         fprintf(stderr, "initSprite: IMG_Load failed: %s\n", SDL_GetError());
