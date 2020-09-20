@@ -27,7 +27,7 @@
 PROJECT_NAME       ?= game
 RAYLIB_VERSION     ?= 2.5.0
 RAYLIB_API_VERSION ?= 251
-RAYLIB_PATH        ?= ..\..
+RAYLIB_PATH        ?= C:\raylib\raylib
 
 # Define compiler path on Windows
 COMPILER_PATH      ?= C:/raylib/mingw/bin
