@@ -1,0 +1,17 @@
+- Raylib: https://github.com/raysan5/raylib (install under C:\raylib)
+
+- Get emscripten there: https://emscripten.org/docs/getting_started/downloads.html
+- emsdk install latest
+- emsdk activate latest
+
+- cd C:\raylib\raylib\src\
+- make PLATFORM=PLATFORM_WEB -B
+- emcc -O1 core.o shapes.o textures.o text.o utils.o models.o raudio.o -shared -o ../src/libraylib.bc
+
+- cd <your raylib project>
+
+- make PLATFORM=PLATFORM_WEB -B
+
+- py -m http.server 8080 (Or python3)
+
+- Visit http://localhost:8080/game.html

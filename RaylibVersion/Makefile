@@ -123,8 +123,8 @@ ifeq ($(PLATFORM),PLATFORM_WEB)
     CLANG_VERSION       = e$(EMSCRIPTEN_VERSION)_64bit
     PYTHON_VERSION      = 2.7.13.1_64bit\python-2.7.13.amd64
     NODE_VERSION        = 8.9.1_64bit
-    export PATH         = $(EMSDK_PATH);$(EMSDK_PATH)\clang\$(CLANG_VERSION);$(EMSDK_PATH)\node\$(NODE_VERSION)\bin;$(EMSDK_PATH)\python\$(PYTHON_VERSION);$(EMSDK_PATH)\emscripten\$(EMSCRIPTEN_VERSION);C:\raylib\MinGW\bin:$$(PATH)
-    EMSCRIPTEN          = $(EMSDK_PATH)\emscripten\$(EMSCRIPTEN_VERSION)
+    export PATH         = $(EMSDK_PATH);$(EMSDK_PATH)/upstream/share/clang;$(EMSDK_PATH)/node/12.18.1_64bit/bin;$(EMSDK_PATH)/python/3.7.4-pywin32_64bit;$(EMSDK_PATH)/upstream/emscripten;C:\raylib\MinGW\bin:$$(PATH)
+    EMSCRIPTEN          = $(EMSDK_PATH)/upstream/emscripten
 endif
 
 # Define raylib release directory for compiled library.
@@ -197,7 +197,7 @@ CFLAGS += -Wall -std=c99 -D_DEFAULT_SOURCE -Wno-missing-braces
 ifeq ($(BUILD_MODE),DEBUG)
     CFLAGS += -g -O0
 else
-    CFLAGS += -s -O1
+    CFLAGS += -s
 endif
 
 # Additional flags for compiler (if desired)

@@ -50,3 +50,8 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+RaylibVersion/game.data
+CVersion/assets/spritesheet.kra~
+RaylibVersion/game.html
+RaylibVersion/game.js
+RaylibVersion/game.wasm
