@@ -55,3 +55,5 @@ CVersion/assets/spritesheet.kra~
 RaylibVersion/game.html
 RaylibVersion/game.js
 RaylibVersion/game.wasm
+RaylibVersion/save.txt
+RaylibVersion/storage.data

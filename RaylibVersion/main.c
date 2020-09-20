@@ -1,4 +1,6 @@
 #define RMEM_IMPLEMENTATION // ObjPool
+#define SUPPORT_TRACELOG
+#define SUPPORT_TRACELOG_DEBUG
 #include <stdlib.h>
 #include <string.h>
 
@@ -35,6 +37,26 @@ sprite_t *texture_test;
 int main()
 {
     InitWindow(screenWidth, screenHeight, "POC raylib");
+    
+    const char* filename = "save.txt";
+    if (FileExists(filename)) {
+        TraceLog(LOG_INFO, "File %s exist", filename);
+        
+        char * buff = LoadFileText(filename);
+        if (buff == NULL)
+            TraceLog(LOG_INFO, "LoadFileText failed");
+        else
+            TraceLog(LOG_INFO, "LoadFileText read %s", buff);
+    } else {
+        TraceLog(LOG_INFO, "File %s does not exist, creating it...", filename);
+        SaveFileText(filename, "42");
+    }
+
+    //unsigned char *LoadFileData(const char *fileName, unsigned int *bytesRead);
+    //void SaveFileData(const char *fileName, void *data, unsigned int bytesToWrite);
+    //char *LoadFileText(const char *fileName);
+    //void SaveFileText(const char *fileName, char *text);
+    //bool FileExists(const char *fileName)
 
     sprite_pool = CreateObjPool(sizeof(sprite_t), MAX_SPRITE);
 
@@ -70,7 +92,7 @@ void UpdateDrawFrame()
     texture_test->rotation++;
 
     // TODO: run physic engine
-    
+
     BeginDrawing();
 
         ClearBackground(RAYWHITE);
@@ -79,8 +101,7 @@ void UpdateDrawFrame()
         DrawLine((int)texture_test->dest.x, 0, (int)texture_test->dest.x, screenHeight, GRAY);
         DrawLine(0, (int)texture_test->dest.y, screenWidth, (int)texture_test->dest.y, GRAY);
         
-
-        DrawText("Congrats! You created your second window!", 190, 200, 20, LIGHTGRAY);
+        DrawText("Everythings' working fine so far...", 190, 200, 20, LIGHTGRAY);
 
     EndDrawing();
 }
