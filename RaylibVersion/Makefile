@@ -240,13 +240,13 @@ ifeq ($(PLATFORM),PLATFORM_WEB)
     # --preload-file resources   # specify a resources folder for data compilation
 
     # Standard arguments
-    CFLAGS += -Os -s USE_GLFW=3 -s TOTAL_MEMORY=16777216 --preload-file resources
+    #CFLAGS += -Os -s USE_GLFW=3 -s TOTAL_MEMORY=16777216 --preload-file resources
 
     # With Asyncify (allow loops) and debug assertoin messages
     #CFLAGS += -Os -s USE_GLFW=3 -s TOTAL_MEMORY=16777216 -s ASYNCIFY -s ASSERTIONS=1 --preload-file resources 
 
     # TODO: For games with more assets:
-    #CFLAGS += -Os -s USE_GLFW=3 -s TOTAL_MEMORY=16777216 -s ALLOW_MEMORY_GROWTH=1 -s ASSERTIONS=1 --preload-file resources 
+    CFLAGS += -Os -s USE_GLFW=3 -s TOTAL_MEMORY=16777216 -s ALLOW_MEMORY_GROWTH=1 -s ASSERTIONS=1 --preload-file resources 
 
     ifeq ($(BUILD_MODE), DEBUG)
         CFLAGS += -s ASSERTIONS=1 --profiling

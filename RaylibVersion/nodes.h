@@ -11,7 +11,11 @@
  */
 typedef struct node_base {
     unsigned int node_type; // make it equal to __COUNTER__ when creating a new node type
-    // TODO: Add node's options
+    void(*callback_free)(struct node_base *);
+    void(*callback_render)(struct node_base *);
+    void(*callback_process)(struct node_base *);
+    void(*callback_event)(struct node_base *);
+    // TODO: USe __attribute__((__packed__)) if there is a problem
     // TODO: add canary to check struct's integrity (-DDEBUG) ?
 } node_base_t;
 static const unsigned int NODE_TYPE_BASE  = __COUNTER__;
@@ -21,6 +25,11 @@ static const unsigned int NODE_TYPE_BASE  = __COUNTER__;
  */
 typedef struct sprite {
     unsigned int node_type;
+    void(*callback_free)(node_base_t *);
+    void(*callback_render)(node_base_t *);
+    void(*callback_process)(node_base_t *);
+    void(*callback_event)(node_base_t *);
+
     Texture2D texture;
     Rectangle clip;
     Rectangle dest;
@@ -35,6 +44,11 @@ static const unsigned int NODE_TYPE_SPRITE = __COUNTER__;
  */
 typedef struct texture {
     unsigned int node_type;
+    void(*callback_free)(node_base_t *);
+    void(*callback_render)(node_base_t *);
+    void(*callback_process)(node_base_t *);
+    void(*callback_event)(node_base_t *);
+
     Texture2D texture;
     int x;
     int y;
@@ -51,49 +65,27 @@ static const unsigned int NODE_TYPE_TEXTURE = __COUNTER__;
  */
 void node_free(node_base_t *ptr)
 {
-    // TODO: if debug enable check for pointer validity
-    if ( ptr->node_type == NODE_TYPE_SPRITE) {
-        TraceLog(LOG_INFO, "Sprite unloaded");
-        UnloadTexture(((sprite_t*) ptr)->texture);
-    }
-    else if ( ptr->node_type == NODE_TYPE_TEXTURE ) {
-        TraceLog(LOG_INFO, "Texture unloaded");
-        UnloadTexture(((texture_t*) ptr)->texture);
-    }
+    // TODO: handle NULL pointers
+    if (ptr->callback_free)
+        (*ptr->callback_free)(ptr);
     free(ptr);
     ptr = NULL;
 }
 
 void node_event(node_base_t *ptr)
 {
-    if ( ptr->node_type == NODE_TYPE_SPRITE) {
-        sprite_t* sprite = (sprite_t*) ptr;
-        if (IsKeyDown(KEY_RIGHT)) sprite->dest.x += 2.0f;
-        if (IsKeyDown(KEY_LEFT)) sprite->dest.x -= 2.0f;
-        if (IsKeyDown(KEY_UP)) sprite->dest.y -= 2.0f;
-        if (IsKeyDown(KEY_DOWN)) sprite->dest.y += 2.0f;
-    }
+    if (ptr->callback_event)
+        (*ptr->callback_event)(ptr);
 }
 
 void node_process(node_base_t *ptr)
 {
-    if ( ptr->node_type == NODE_TYPE_SPRITE) {
-        sprite_t* sprite = (sprite_t*) ptr;
-        sprite->rotation++;
-    }
+    if (ptr->callback_process)
+        (*ptr->callback_process)(ptr);
 }
 
 void node_render(node_base_t *ptr)
 {
-    // TODO: if debug enable check for pointer validity
-    if ( ptr->node_type == NODE_TYPE_SPRITE) {
-        sprite_t* sprite = (sprite_t*) ptr;
-        DrawTexturePro(sprite->texture, sprite->clip, sprite->dest, sprite->center, (float)sprite->rotation, sprite->tint);
-        DrawLine((int)sprite->dest.x, 0, (int)sprite->dest.x, 500, GRAY);
-        DrawLine(0, (int)sprite->dest.y, 300, (int)sprite->dest.y, GRAY);
-    }
-    else if ( ptr->node_type == NODE_TYPE_TEXTURE ) {
-        texture_t* tex = (texture_t*) ptr;
-        DrawTexture(tex->texture, tex->x, tex->y, tex->tint);
-    }
+    if (ptr->callback_render)
+        (*ptr->callback_render)(ptr);
 }
