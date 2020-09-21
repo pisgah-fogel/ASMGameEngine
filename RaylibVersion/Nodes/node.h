@@ -93,7 +93,7 @@ void node_render(node_base_t *ptr)
 typedef struct node_root {
     int screenWidth;
     int screenHeight;
-    struct node_base* head; // First element of the node tree
+    node_base_t* head; // First element of the node tree
 } node_root_t;
 
 node_root_t* node_root_init(int screenWidth, int screenHeight, const char* windowName) {
@@ -101,7 +101,13 @@ node_root_t* node_root_init(int screenWidth, int screenHeight, const char* windo
     node_root_t* ptr = (node_root_t*)malloc(sizeof(node_root_t));
     ptr->screenHeight = screenHeight;
     ptr->screenWidth = screenWidth;
+    ptr->head = NULL;
     return ptr;
+}
+
+void node_root_set_head(node_root_t* ptr, node_base_t* head) {
+    ptr->head = head;
+    head->parent = NULL; // It's the "head" of the node tree, then it does not have parent
 }
 
 void node_root_free(node_root_t** ptr) {

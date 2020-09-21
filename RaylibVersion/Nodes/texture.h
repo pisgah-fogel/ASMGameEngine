@@ -47,5 +47,8 @@ static node_base_t* create_texture() {
     texture_test->callback_ready = NULL;
     texture_test->callback_exiting = NULL;
     texture_test->data = NULL;
+    texture_test->parent = NULL;
+    texture_test->child = NULL;
+    texture_test->child_count = 0;
     return texture_test;
 }

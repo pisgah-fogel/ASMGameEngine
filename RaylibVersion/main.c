@@ -46,9 +46,12 @@ int main()
     }
 
     sprite_test = create_sprite();
-    node_init(sprite_test);
-
+    node_root_set_head(root, sprite_test);
+    
     texture_test = create_texture();
+    node_add_child(sprite_test, texture_test);
+
+    node_init(sprite_test);
     node_init(texture_test);
 
 #if defined(PLATFORM_WEB)
@@ -62,8 +65,6 @@ int main()
     }
 #endif
 
-    node_free(sprite_test);
-    node_free(texture_test);
     node_root_free(&root);
     printf("No segfault\n");
     return 0;

@@ -68,5 +68,8 @@ static node_base_t* create_sprite() {
     sprite_test->callback_ready = NULL;
     sprite_test->callback_exiting = NULL;
     sprite_test->data = NULL;
+    sprite_test->parent = NULL;
+    sprite_test->child = NULL;
+    sprite_test->child_count = 0;
     return sprite_test;
 }
