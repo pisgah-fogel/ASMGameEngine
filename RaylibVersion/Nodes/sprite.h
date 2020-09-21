@@ -51,6 +51,7 @@ void _init_sprite(void *arg) {
     sprite_t *ptr = ((node_base_t*)arg)->data;
     ptr->texture = LoadTexture("resources/spritesheet.png");
     ptr->clip = (Rectangle){ 100.0f, 0.0f, 100.0f, 100.0f };
+    // TODO: screenHeight screenWidth
     ptr->dest = (Rectangle){ 400.0f, 400.0f, 100.0f, 100.0f };
     ptr->center = (Vector2){ 50.0f, 50.0f };
     ptr->rotation = 0;

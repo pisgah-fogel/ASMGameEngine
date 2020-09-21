@@ -36,8 +36,12 @@
 
 #include <stdlib.h>
 
-#define LIST_TYPE int
-#define LIST_NIL -1
+#include "Nodes/node.h"
+
+#define LIST_TYPE node_base_t*
+#define LIST_NIL NULL
+
+typedef struct node_base node_base_t;
 
 typedef struct element
 {
@@ -47,6 +51,12 @@ typedef struct element
 
 typedef element_t* list_t;
 
+/**
+ * @brief Append some data to the list
+ * 
+ * @param list pointer to the list (element_t**)
+ * @param data data of type LIST_TYPE to append to the list
+ */
 void list_append(list_t *list, LIST_TYPE data) {
     element_t* elm = (element_t*)malloc(sizeof(element_t));
     elm->data = data;
@@ -57,7 +67,7 @@ void list_append(list_t *list, LIST_TYPE data) {
 /**
  * @brief If LIST_TYPE is a pointer, this function does not free it
  * 
- * @param list list to free
+ * @param list pointer to the list (element_t**)
  */
 void list_clear(list_t *list) {
     element_t* ptr;

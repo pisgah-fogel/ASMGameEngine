@@ -11,14 +11,10 @@
 #include "Nodes/texture.h"
 
 // #define PLATFORM_WEB
-#define MAX_SPRITE 10
 
 #if defined(PLATFORM_WEB)
     #include <emscripten/emscripten.h>
 #endif
-
-int screenWidth = 800;
-int screenHeight = 450;
 
 /**
  * @brief Render everything
@@ -29,10 +25,12 @@ node_base_t *sprite_test;
 
 node_base_t *texture_test;
 
+node_root_t* root;
+
 int main()
 {
-    InitWindow(screenWidth, screenHeight, "POC raylib");
-    
+    root = node_root_init(450, 800, "Node Test");
+
     const char* filename = "save.txt";
     if (FileExists(filename)) {
         TraceLog(LOG_INFO, "File %s exist", filename);
@@ -66,8 +64,8 @@ int main()
 
     node_free(sprite_test);
     node_free(texture_test);
-
-    CloseWindow();
+    node_root_free(&root);
+    printf("No segfault\n");
     return 0;
 }
 
