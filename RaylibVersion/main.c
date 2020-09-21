@@ -6,7 +6,9 @@
 
 #include "raylib.h"
 
-#include "nodes.h"
+#include "Nodes/node.h"
+#include "Nodes/sprite.h"
+#include "Nodes/texture.h"
 
 // #define PLATFORM_WEB
 #define MAX_SPRITE 10
@@ -27,90 +29,6 @@ node_base_t *sprite_test;
 
 node_base_t *texture_test;
 
-/**
- * @brief Sprites can be rotated and scaled
- */
-typedef struct sprite {
-    Texture2D texture;
-    Rectangle clip;
-    Rectangle dest;
-    Vector2 center; // 0, 0 is the top left of the clipped texture
-    int rotation;
-    Color tint;
-} sprite_t;
-
-/**
- * @brief Same as sprites but does not rotate or get scaled
- */
-typedef struct texture {
-    Texture2D texture;
-    int x;
-    int y;
-    Color tint;
-} texture_t;
-
-void _free_sprite(void *arg) {
-    TraceLog(LOG_INFO, "_free_sprite");
-    sprite_t *ptr = ((node_base_t*)arg)->data;
-    // TODO: if debug enable check for pointer validity
-    UnloadTexture(ptr->texture);
-    free(ptr); // Free our data
-    ptr = NULL;
-}
-
-void _free_texture(void *arg) {
-    TraceLog(LOG_INFO, "_free_texture");
-    texture_t *ptr = ((node_base_t*)arg)->data;
-    UnloadTexture(ptr->texture);
-    free(ptr); // Free our data
-    ptr = NULL;
-}
-
-void _render_sprite(void *arg) {
-    sprite_t *ptr = ((node_base_t*)arg)->data;
-    DrawTexturePro(ptr->texture, ptr->clip, ptr->dest, ptr->center, (float)ptr->rotation, ptr->tint);
-    DrawLine((int)ptr->dest.x, 0, (int)ptr->dest.x, 500, GRAY);
-    DrawLine(0, (int)ptr->dest.y, 300, (int)ptr->dest.y, GRAY);
-}
-
-void _render_texture(void *arg) {
-    texture_t *ptr = ((node_base_t*)arg)->data;
-    DrawTexture(ptr->texture, ptr->x, ptr->y, ptr->tint);
-}
-
-void _process_sprite(void *arg) {
-    sprite_t *ptr = ((node_base_t*)arg)->data;
-    ptr->rotation++;
-}
-
-void _event_sprite(void *arg) {
-    sprite_t *ptr = ((node_base_t*)arg)->data;
-    if (IsKeyDown(KEY_RIGHT)) ptr->dest.x += 2.0f;
-    if (IsKeyDown(KEY_LEFT)) ptr->dest.x -= 2.0f;
-    if (IsKeyDown(KEY_UP)) ptr->dest.y -= 2.0f;
-    if (IsKeyDown(KEY_DOWN)) ptr->dest.y += 2.0f;
-}
-
-void _init_sprite(void *arg) {
-    ((node_base_t*)arg)->data = malloc(sizeof(sprite_t));
-    sprite_t *ptr = ((node_base_t*)arg)->data;
-    ptr->texture = LoadTexture("resources/spritesheet.png");
-    ptr->clip = (Rectangle){ 100.0f, 0.0f, 100.0f, 100.0f };
-    ptr->dest = (Rectangle){ (float)screenWidth/2, (float)screenHeight/2, 100.0f, 100.0f };
-    ptr->center = (Vector2){ 50.0f, 50.0f };
-    ptr->rotation = 0;
-    ptr->tint = WHITE;
-}
-
-void _init_texture(void* arg) {
-    ((node_base_t*)arg)->data = malloc(sizeof(texture_t));
-    texture_t *ptr = ((node_base_t*)arg)->data;
-    ptr->texture = LoadTexture("resources/spritesheet.png");
-    ptr->x = 0;
-    ptr->y = 0;
-    ptr->tint = (Color){0, 200, 200, 150};
-}
-
 int main()
 {
     InitWindow(screenWidth, screenHeight, "POC raylib");
@@ -129,26 +47,10 @@ int main()
         SaveFileText(filename, "42");
     }
 
-    sprite_test = (node_base_t*)malloc(sizeof(node_base_t));
-    sprite_test->callback_free = &_free_sprite;
-    sprite_test->callback_render = &_render_sprite;
-    sprite_test->callback_process = &_process_sprite;
-    sprite_test->callback_event = &_event_sprite;
-    sprite_test->callback_init = &_init_sprite;
-    sprite_test->callback_ready = NULL;
-    sprite_test->callback_exiting = NULL;
-    sprite_test->data = NULL;
+    sprite_test = create_sprite();
     node_init(sprite_test);
 
-    texture_test = (node_base_t*)malloc(sizeof(node_base_t));
-    texture_test->callback_free = &_free_texture;
-    texture_test->callback_render = &_render_texture;
-    texture_test->callback_process = NULL;
-    texture_test->callback_event = NULL;
-    texture_test->callback_init = &_init_texture;
-    texture_test->callback_ready = NULL;
-    texture_test->callback_exiting = NULL;
-    texture_test->data = NULL;
+    texture_test = create_texture();
     node_init(texture_test);
 
 #if defined(PLATFORM_WEB)
