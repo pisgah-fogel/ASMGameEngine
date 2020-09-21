@@ -27,46 +27,66 @@ node_base_t *sprite_test;
 
 node_base_t *texture_test;
 
-void _free_sprite(node_base_t *ptr) {
+/**
+ * @brief Sprites can be rotated and scaled
+ */
+typedef struct sprite {
+    Texture2D texture;
+    Rectangle clip;
+    Rectangle dest;
+    Vector2 center; // 0, 0 is the top left of the clipped texture
+    int rotation;
+    Color tint;
+} sprite_t;
+
+/**
+ * @brief Same as sprites but does not rotate or get scaled
+ */
+typedef struct texture {
+    Texture2D texture;
+    int x;
+    int y;
+    Color tint;
+} texture_t;
+
+void _free_sprite(void *ptr) {
     // TODO: if debug enable check for pointer validity
-    if ( ptr->node_type == NODE_TYPE_SPRITE) {
-        TraceLog(LOG_INFO, "Sprite unloaded");
-        UnloadTexture(((sprite_t*) ptr)->texture);
-    }
+    TraceLog(LOG_INFO, "Sprite unloaded");
+    UnloadTexture(((sprite_t*) ptr)->texture);
+    free(ptr); // Free our data
+    ptr = NULL;
 }
 
-void _free_texture(node_base_t *ptr) {
-    if ( ptr->node_type == NODE_TYPE_TEXTURE ) {
-        TraceLog(LOG_INFO, "Texture unloaded");
-        UnloadTexture(((texture_t*) ptr)->texture);
-    }
+void _free_texture(void *ptr) {
+    TraceLog(LOG_INFO, "Texture unloaded");
+    UnloadTexture(((texture_t*) ptr)->texture);
+    free(ptr); // Free our data
+    ptr = NULL;
 }
 
-void _render_sprite(node_base_t *ptr) {
+void _render_sprite(void *ptr) {
     sprite_t* sprite = (sprite_t*) ptr;
     DrawTexturePro(sprite->texture, sprite->clip, sprite->dest, sprite->center, (float)sprite->rotation, sprite->tint);
     DrawLine((int)sprite->dest.x, 0, (int)sprite->dest.x, 500, GRAY);
     DrawLine(0, (int)sprite->dest.y, 300, (int)sprite->dest.y, GRAY);
 }
 
-void _render_texture(node_base_t *ptr) {
+void _render_texture(void *ptr) {
     texture_t* tex = (texture_t*) ptr;
     DrawTexture(tex->texture, tex->x, tex->y, tex->tint);
 }
 
-void _process_sprite(node_base_t *ptr) {
+void _process_sprite(void *ptr) {
     sprite_t* sprite = (sprite_t*) ptr;
     sprite->rotation++;
 }
 
-void _event_sprite(node_base_t *ptr) {
-    if ( ptr->node_type == NODE_TYPE_SPRITE) {
-        sprite_t* sprite = (sprite_t*) ptr;
-        if (IsKeyDown(KEY_RIGHT)) sprite->dest.x += 2.0f;
-        if (IsKeyDown(KEY_LEFT)) sprite->dest.x -= 2.0f;
-        if (IsKeyDown(KEY_UP)) sprite->dest.y -= 2.0f;
-        if (IsKeyDown(KEY_DOWN)) sprite->dest.y += 2.0f;
-    }
+void _event_sprite(void *ptr) {
+    sprite_t* sprite = (sprite_t*) ptr;
+    if (IsKeyDown(KEY_RIGHT)) sprite->dest.x += 2.0f;
+    if (IsKeyDown(KEY_LEFT)) sprite->dest.x -= 2.0f;
+    if (IsKeyDown(KEY_UP)) sprite->dest.y -= 2.0f;
+    if (IsKeyDown(KEY_DOWN)) sprite->dest.y += 2.0f;
 }
 
 int main()
@@ -87,29 +107,28 @@ int main()
         SaveFileText(filename, "42");
     }
 
-    sprite_t* tmp_sprite = (sprite_t*)malloc(sizeof(sprite_t));
-    tmp_sprite->node_type = NODE_TYPE_SPRITE;
-    tmp_sprite->callback_free = &_free_sprite;
-    tmp_sprite->callback_render = &_render_sprite;
-    tmp_sprite->callback_process = &_process_sprite;
-    tmp_sprite->callback_event = &_event_sprite;
-    tmp_sprite->texture = LoadTexture("resources/spritesheet.png");
-    tmp_sprite->clip = (Rectangle){ 100.0f, 0.0f, 100.0f, 100.0f };
-    tmp_sprite->dest = (Rectangle){ (float)screenWidth/2, (float)screenHeight/2, 100.0f, 100.0f };
-    tmp_sprite->center = (Vector2){ 50.0f, 50.0f };
-    tmp_sprite->rotation = 0;
-    tmp_sprite->tint = WHITE;
-    sprite_test = (node_base_t*)tmp_sprite;
+    sprite_test = (node_base_t*)malloc(sizeof(node_base_t));
+    sprite_test->callback_free = &_free_sprite;
+    sprite_test->callback_render = &_render_sprite;
+    sprite_test->callback_process = &_process_sprite;
+    sprite_test->callback_event = &_event_sprite;
+    sprite_test->data = malloc(sizeof(sprite_t));
+    
+    ((sprite_t*)sprite_test->data)->texture = LoadTexture("resources/spritesheet.png");
+    ((sprite_t*)sprite_test->data)->clip = (Rectangle){ 100.0f, 0.0f, 100.0f, 100.0f };
+    ((sprite_t*)sprite_test->data)->dest = (Rectangle){ (float)screenWidth/2, (float)screenHeight/2, 100.0f, 100.0f };
+    ((sprite_t*)sprite_test->data)->center = (Vector2){ 50.0f, 50.0f };
+    ((sprite_t*)sprite_test->data)->rotation = 0;
+    ((sprite_t*)sprite_test->data)->tint = WHITE;
 
-    texture_t* tmp_texture = (texture_t*)malloc(sizeof(texture_t));
-    tmp_texture->node_type = NODE_TYPE_TEXTURE;
-    tmp_texture->callback_free = &_free_texture;
-    tmp_texture->callback_render = &_render_texture;
-    tmp_texture->texture = LoadTexture("resources/spritesheet.png");
-    tmp_texture->x = 0;
-    tmp_texture->y = 0;
-    tmp_texture->tint = (Color){0, 200, 200, 150};
-    texture_test = (node_base_t*)tmp_texture;
+    texture_test = (node_base_t*)malloc(sizeof(node_base_t));
+    texture_test->callback_free = &_free_texture;
+    texture_test->callback_render = &_render_texture;
+    texture_test->data = malloc(sizeof(texture_t));
+    ((texture_t*)texture_test->data)->texture = LoadTexture("resources/spritesheet.png");
+    ((texture_t*)texture_test->data)->x = 0;
+    ((texture_t*)texture_test->data)->y = 0;
+    ((texture_t*)texture_test->data)->tint = (Color){0, 200, 200, 150};
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 0, 1); // Web platform does not like never endind loops
