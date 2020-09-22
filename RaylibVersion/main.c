@@ -91,9 +91,7 @@ void UpdateDrawFrame()
 
         ClearBackground(RAYWHITE);
 
-        node_render(texture_test);
-
-        node_render(sprite_test);
+        node_root_render(root);
         
         DrawText("Everythings' working fine so far...", 190, 200, 20, LIGHTGRAY);
 

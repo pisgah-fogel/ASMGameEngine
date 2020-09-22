@@ -90,6 +90,22 @@ void node_render(node_base_t *ptr)
         (*ptr->callback_render)(ptr);
 }
 
+void node_recursive_render(node_base_t *ptr)
+{
+    printf("node recursive render\n");
+    node_render(ptr);
+    
+    // Iterate through childs and render them
+    element_t* it;
+    element_t* it_next = ptr->child;
+    while(it_next != NULL) {
+        it = it_next;
+        it_next = it->next;
+        if (it->data != NULL)
+            node_recursive_render(it->data);
+    }
+}
+
 typedef struct node_root {
     int screenWidth;
     int screenHeight;
@@ -117,4 +133,12 @@ void node_root_free(node_root_t** ptr) {
     *ptr = NULL;
 
     CloseWindow();
+}
+
+void node_root_render(node_root_t* ptr) {
+    printf("node root render\n");
+    if (ptr->head != NULL) {
+        // Iterate through childs and render them
+        node_recursive_render(ptr->head);
+    }
 }
