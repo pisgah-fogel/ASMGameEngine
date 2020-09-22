@@ -44,6 +44,7 @@ void node_add_child(node_base_t *parent, node_base_t *child)
  * 
  * @param ptr pointer to the node
  * 
+ * TODO: Optimisation: do not call list_remove_by_reference when we are removing the parent (recursive call)
  */
 void node_free(node_base_t *ptr)
 {
