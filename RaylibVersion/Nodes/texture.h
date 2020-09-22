@@ -15,22 +15,22 @@ typedef struct texture {
     Color tint;
 } texture_t;
 
-void _free_texture(node_base_t *arg) {
+void _free_texture(node_base_t *self) {
     TraceLog(LOG_INFO, "_free_texture");
-    texture_t *ptr = ((node_base_t*)arg)->data;
+    texture_t *ptr = self->data;
     UnloadTexture(ptr->texture);
     free(ptr); // Free our data
     ptr = NULL;
 }
 
-void _render_texture(node_base_t *arg) {
-    texture_t *ptr = ((node_base_t*)arg)->data;
+void _render_texture(node_base_t *self) {
+    texture_t *ptr = self->data;
     DrawTexture(ptr->texture, ptr->x, ptr->y, ptr->tint);
 }
 
-void _init_texture(node_base_t* arg) {
-    ((node_base_t*)arg)->data = malloc(sizeof(texture_t));
-    texture_t *ptr = ((node_base_t*)arg)->data;
+void _init_texture(node_base_t* self) {
+    self->data = malloc(sizeof(texture_t));
+    texture_t *ptr = self->data;
     ptr->texture = LoadTexture("resources/spritesheet.png");
     ptr->x = 0;
     ptr->y = 0;
