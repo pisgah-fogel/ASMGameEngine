@@ -39,6 +39,8 @@ void _init_texture(node_base_t* self) {
 
 static node_base_t* create_texture() {
     node_base_t* texture_test = (node_base_t*)malloc(sizeof(node_base_t));
+    texture_test->id = consthash("texture_test_1");
+    printf("Texture test id: %d\n", texture_test->id);
     texture_test->callback_free = &_free_texture;
     texture_test->callback_render = &_render_texture;
     texture_test->callback_process = NULL;
