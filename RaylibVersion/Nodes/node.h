@@ -29,8 +29,15 @@ typedef struct node_base {
     // TODO: add canary to check struct's integrity (-DDEBUG) ?
 } node_base_t;
 
+void node_init(node_base_t *ptr)
+{
+    if (ptr->callback_init)
+        (*ptr->callback_init)(ptr);
+}
+
 void node_add_child(node_base_t *parent, node_base_t *child)
 {
+    node_init(child);
     list_append(&parent->child, child);
     child->parent = parent;
     parent->child_count++;
@@ -79,10 +86,19 @@ void node_free(node_base_t *ptr)
     ptr = NULL;
 }
 
-void node_init(node_base_t *ptr)
+void node_recursive_init(node_base_t *ptr)
 {
-    if (ptr->callback_init)
-        (*ptr->callback_init)(ptr);
+    node_init(ptr);
+    
+    // Iterate through childs
+    element_t* it;
+    element_t* it_next = ptr->child;
+    while(it_next != NULL) {
+        it = it_next;
+        it_next = it->next;
+        if (it->data != NULL)
+            node_recursive_init(it->data);
+    }
 }
 
 void node_event(node_base_t *ptr)
@@ -139,7 +155,7 @@ typedef struct node_root {
     node_base_t* head; // First element of the node tree
 } node_root_t;
 
-node_root_t* node_root_init(int screenWidth, int screenHeight, const char* windowName) {
+node_root_t* node_root_create(int screenWidth, int screenHeight, const char* windowName) {
     InitWindow(screenWidth, screenHeight, windowName);
     node_root_t* ptr = (node_root_t*)malloc(sizeof(node_root_t));
     ptr->screenHeight = screenHeight;
@@ -149,6 +165,7 @@ node_root_t* node_root_init(int screenWidth, int screenHeight, const char* windo
 }
 
 void node_root_set_head(node_root_t* ptr, node_base_t* head) {
+    node_init(head); // node_add_child is not going to be called on this one, need to call it here
     ptr->head = head;
     head->parent = NULL; // It's the "head" of the node tree, then it does not have parent
 }
@@ -172,5 +189,16 @@ void node_root_render(node_root_t* ptr) {
 void node_root_event(node_root_t* ptr) {
     if (ptr->head != NULL) {
         node_recursive_event(ptr->head);
+    }
+}
+
+/**
+ * @brief Not usefull, _init is automatically called when node_add_child is called
+ * 
+ * @param ptr 
+ */
+void node_root_init(node_root_t* ptr) {
+    if (ptr->head != NULL) {
+        node_recursive_init(ptr->head);
     }
 }

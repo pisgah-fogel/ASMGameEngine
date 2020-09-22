@@ -35,18 +35,15 @@ Camera2D camera = { 0 };
 
 int main()
 {
-    root = node_root_init(800, 800, "Node Test");
+    root = node_root_create(800, 800, "Node Test");
 
     sprite_test = create_sprite();
     node_root_set_head(root, sprite_test);
-    
+
     texture_test = create_texture();
     node_add_child(sprite_test, texture_test);
 
     list_print(sprite_test->child);
-
-    node_init(sprite_test);
-    node_init(texture_test);
 
     camera.target = (Vector2){0, 0};
     camera.offset = (Vector2){ root->screenWidth/2, root->screenWidth/2 };
