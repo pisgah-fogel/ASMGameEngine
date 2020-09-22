@@ -24,7 +24,6 @@ typedef struct node_base {
     struct node_base* parent; // The parent node, NULL if it is the 'head' of the node tree
     list_t child; // Must be initialized to NULL, contains a list of children (nodes too)
     unsigned int child_count;
-    Vector3 position;// Position of the node, by default place it in the center of your node's graphics
     // TODO: Use __attribute__((__packed__)) if there is a problem
     // TODO: add canary to check struct's integrity (-DDEBUG) ?
 } node_base_t;
@@ -74,6 +73,7 @@ void node_free(node_base_t *ptr)
     
     // remove the node from it's parent
     if (ptr->parent != NULL) {
+        ptr->parent->child_count--;
         //size_t status = list_remplace((ptr->parent->child), ptr, NULL); // This works too, but leave empty nodes childs in the parent's child list
         size_t status = list_remove_by_reference(&(ptr->parent->child), ptr);
         printf("node_free: list_remove_by_reference returned %d\n", status);
