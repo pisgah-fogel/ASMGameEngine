@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "raylib.h"
+#include "raymath.h"
 
 #include "Nodes/node.h"
 #include "Nodes/sprite.h"
@@ -21,15 +22,19 @@
  */
 void UpdateDrawFrame();
 
+void CameraSmoothFollow(Camera2D *camera, Vector2 target, float delta);
+
 node_base_t *sprite_test;
 
 node_base_t *texture_test;
 
 node_root_t* root;
 
+Camera2D camera = { 0 };
+
 int main()
 {
-    root = node_root_init(450, 800, "Node Test");
+    root = node_root_init(800, 800, "Node Test");
 
     sprite_test = create_sprite();
     node_root_set_head(root, sprite_test);
@@ -39,6 +44,11 @@ int main()
 
     node_init(sprite_test);
     node_init(texture_test);
+
+    camera.target = (Vector2){0, 0};
+    camera.offset = (Vector2){ root->screenWidth/2, root->screenWidth/2 };
+    camera.rotation = 0.0f;
+    camera.zoom = 1.0f;
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 0, 1); // Web platforms does not like never endind loops
@@ -61,6 +71,7 @@ Color cursorColor = DARKBLUE;
 
 void UpdateDrawFrame()
 {
+    float delta = GetFrameTime();
     // Handle Events
     node_event(sprite_test);
     cursorPosition = GetMousePosition();
@@ -73,12 +84,20 @@ void UpdateDrawFrame()
 
     // TODO: run physic engine
 
+    CameraSmoothFollow(&camera, (Vector2){((sprite_t*)sprite_test->data)->dest.x, ((sprite_t*)sprite_test->data)->dest.y}, delta);
+
     BeginDrawing();
 
         ClearBackground(RAYWHITE);
 
+        BeginMode2D(camera);
+
         node_root_render(root);
-        
+
+        EndMode2D();
+
+        DrawCircleV(cursorPosition, 40, cursorColor);
+
         DrawText("Everythings' working fine so far...", 190, 200, 20, LIGHTGRAY);
 
         DrawText(TextFormat("DETECTED AXIS [%i]:", GetGamepadAxisCount(GAMEPAD_PLAYER1)), 10, 50, 10, MAROON);
@@ -90,8 +109,6 @@ void UpdateDrawFrame()
 
         if (GetGamepadButtonPressed() != -1) DrawText(TextFormat("DETECTED BUTTON: %i", GetGamepadButtonPressed()), 10, 430, 10, RED);
         else DrawText("DETECTED BUTTON: NONE", 10, 430, 10, GRAY);
-
-        DrawCircleV(cursorPosition, 40, cursorColor);
 
     EndDrawing();
 }
@@ -110,5 +127,21 @@ void file_io_test()
     } else {
         TraceLog(LOG_INFO, "File %s does not exist, creating it...", filename);
         SaveFileText(filename, "42");
+    }
+}
+
+void CameraSmoothFollow(Camera2D *camera, Vector2 target, float delta)
+{
+    const float minSpeed = 30;
+    const float minEffectLength = 10;
+    const float fractionSpeed = 0.8f;
+    
+    Vector2 diff = Vector2Subtract(target, camera->target);
+    float length = Vector2Length(diff);
+    
+    if (length > minEffectLength)
+    {
+        float speed = fmaxf(fractionSpeed*length, minSpeed);
+        camera->target = Vector2Add(camera->target, Vector2Scale(diff, speed*delta/length));
     }
 }
