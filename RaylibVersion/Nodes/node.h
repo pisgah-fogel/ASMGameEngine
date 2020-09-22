@@ -78,6 +78,21 @@ void node_event(node_base_t *ptr)
         (*ptr->callback_event)(ptr);
 }
 
+void node_recursive_event(node_base_t *ptr)
+{
+    node_event(ptr);
+    
+    // Iterate through childs
+    element_t* it;
+    element_t* it_next = ptr->child;
+    while(it_next != NULL) {
+        it = it_next;
+        it_next = it->next;
+        if (it->data != NULL)
+            node_recursive_event(it->data);
+    }
+}
+
 void node_process(node_base_t *ptr)
 {
     if (ptr->callback_process)
@@ -92,7 +107,6 @@ void node_render(node_base_t *ptr)
 
 void node_recursive_render(node_base_t *ptr)
 {
-    printf("node recursive render\n");
     node_render(ptr);
     
     // Iterate through childs and render them
@@ -136,9 +150,14 @@ void node_root_free(node_root_t** ptr) {
 }
 
 void node_root_render(node_root_t* ptr) {
-    printf("node root render\n");
     if (ptr->head != NULL) {
         // Iterate through childs and render them
         node_recursive_render(ptr->head);
+    }
+}
+
+void node_root_event(node_root_t* ptr) {
+    if (ptr->head != NULL) {
+        node_recursive_event(ptr->head);
     }
 }
