@@ -31,20 +31,6 @@ int main()
 {
     root = node_root_init(450, 800, "Node Test");
 
-    const char* filename = "save.txt";
-    if (FileExists(filename)) {
-        TraceLog(LOG_INFO, "File %s exist", filename);
-        
-        char * buff = LoadFileText(filename);
-        if (buff == NULL)
-            TraceLog(LOG_INFO, "LoadFileText failed");
-        else
-            TraceLog(LOG_INFO, "LoadFileText read %s", buff);
-    } else {
-        TraceLog(LOG_INFO, "File %s does not exist, creating it...", filename);
-        SaveFileText(filename, "42");
-    }
-
     sprite_test = create_sprite();
     node_root_set_head(root, sprite_test);
     
@@ -55,7 +41,7 @@ int main()
     node_init(texture_test);
 
 #if defined(PLATFORM_WEB)
-    emscripten_set_main_loop(UpdateDrawFrame, 0, 1); // Web platform does not like never endind loops
+    emscripten_set_main_loop(UpdateDrawFrame, 0, 1); // Web platforms does not like never endind loops
 #else
     SetTargetFPS(60);
     // Main Game Loop
@@ -108,4 +94,21 @@ void UpdateDrawFrame()
         DrawCircleV(cursorPosition, 40, cursorColor);
 
     EndDrawing();
+}
+
+void file_io_test()
+{
+    const char* filename = "save.txt";
+    if (FileExists(filename)) {
+        TraceLog(LOG_INFO, "File %s exist", filename);
+        
+        char * buff = LoadFileText(filename);
+        if (buff == NULL)
+            TraceLog(LOG_INFO, "LoadFileText failed");
+        else
+            TraceLog(LOG_INFO, "LoadFileText read %s", buff);
+    } else {
+        TraceLog(LOG_INFO, "File %s does not exist, creating it...", filename);
+        SaveFileText(filename, "42");
+    }
 }
