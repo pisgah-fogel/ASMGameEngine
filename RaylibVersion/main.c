@@ -46,7 +46,7 @@ int main()
     list_print(sprite_test->child);
 
     camera.target = (Vector2){0, 0};
-    camera.offset = (Vector2){ root->screenWidth/2, root->screenWidth/2 };
+    camera.offset = (Vector2){ (float)root->screenWidth/2, (float)root->screenWidth/2 };
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
 
@@ -111,23 +111,6 @@ void UpdateDrawFrame()
         else DrawText("DETECTED BUTTON: NONE", 10, 430, 10, GRAY);
 
     EndDrawing();
-}
-
-void file_io_test()
-{
-    const char* filename = "save.txt";
-    if (FileExists(filename)) {
-        TraceLog(LOG_INFO, "File %s exist", filename);
-        
-        char * buff = LoadFileText(filename);
-        if (buff == NULL)
-            TraceLog(LOG_INFO, "LoadFileText failed");
-        else
-            TraceLog(LOG_INFO, "LoadFileText read %s", buff);
-    } else {
-        TraceLog(LOG_INFO, "File %s does not exist, creating it...", filename);
-        SaveFileText(filename, "42");
-    }
 }
 
 void CameraSmoothFollow(Camera2D *camera, Vector2 target, float delta)

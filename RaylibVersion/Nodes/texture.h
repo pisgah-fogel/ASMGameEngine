@@ -17,20 +17,20 @@ typedef struct texture {
 
 void _free_texture(node_base_t *self) {
     TraceLog(LOG_INFO, "_free_texture");
-    texture_t *ptr = self->data;
+    texture_t *ptr = (texture_t*)self->data;
     UnloadTexture(ptr->texture);
     free(ptr); // Free our data
     ptr = NULL;
 }
 
 void _render_texture(node_base_t *self) {
-    texture_t *ptr = self->data;
+    texture_t *ptr = (texture_t*)self->data;
     DrawTexture(ptr->texture, ptr->x, ptr->y, ptr->tint);
 }
 
 void _init_texture(node_base_t* self) {
     self->data = malloc(sizeof(texture_t));
-    texture_t *ptr = self->data;
+    texture_t *ptr = (texture_t*)self->data;
     ptr->texture = LoadTexture("resources/spritesheet.png");
     ptr->x = 0;
     ptr->y = 0;

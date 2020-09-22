@@ -7,6 +7,22 @@
 #include "rmem.h"
 
 #include "list.h"
+static constexpr unsigned int SlowHash(const char* str) 
+	{ 
+		if (str != nullptr)
+		{
+			unsigned int h = 89;
+			while (*str != 0)
+			{
+				h = h * 33 + (*str++);
+			}
+			return h;
+		}
+		else
+		{
+			return 0;
+		}
+	}
 
 /**
  * @brief All nodes are converted to this structure before being cast to there original structure
