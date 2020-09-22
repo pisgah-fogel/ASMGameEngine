@@ -17,7 +17,7 @@ typedef struct sprite {
     Color tint;
 } sprite_t;
 
-void _free_sprite(void *arg) {
+void _free_sprite(node_base_t *arg) {
     TraceLog(LOG_INFO, "_free_sprite");
     sprite_t *ptr = ((node_base_t*)arg)->data;
     // TODO: if debug enable check for pointer validity
@@ -26,19 +26,19 @@ void _free_sprite(void *arg) {
     ptr = NULL;
 }
 
-void _render_sprite(void *arg) {
+void _render_sprite(node_base_t *arg) {
     sprite_t *ptr = ((node_base_t*)arg)->data;
     DrawTexturePro(ptr->texture, ptr->clip, ptr->dest, ptr->center, (float)ptr->rotation, ptr->tint);
     DrawLine((int)ptr->dest.x, 0, (int)ptr->dest.x, 500, GRAY);
     DrawLine(0, (int)ptr->dest.y, 300, (int)ptr->dest.y, GRAY);
 }
 
-void _process_sprite(void *arg) {
+void _process_sprite(node_base_t *arg) {
     sprite_t *ptr = ((node_base_t*)arg)->data;
     ptr->rotation++;
 }
 
-void _event_sprite(void *arg) {
+void _event_sprite(node_base_t *arg) {
     sprite_t *ptr = ((node_base_t*)arg)->data;
     if (IsKeyDown(KEY_RIGHT)) ptr->dest.x += 2.0f;
     if (IsKeyDown(KEY_LEFT)) ptr->dest.x -= 2.0f;
@@ -46,13 +46,13 @@ void _event_sprite(void *arg) {
     if (IsKeyDown(KEY_DOWN)) ptr->dest.y += 2.0f;
 }
 
-void _init_sprite(void *arg) {
+void _init_sprite(node_base_t *arg) {
     ((node_base_t*)arg)->data = malloc(sizeof(sprite_t));
     sprite_t *ptr = ((node_base_t*)arg)->data;
     ptr->texture = LoadTexture("resources/spritesheet.png");
     ptr->clip = (Rectangle){ 100.0f, 0.0f, 100.0f, 100.0f };
     // TODO: screenHeight screenWidth
-    ptr->dest = (Rectangle){ 400.0f, 400.0f, 100.0f, 100.0f };
+    ptr->dest = (Rectangle){ 0.0f, 0.0f, 100.0f, 100.0f };
     ptr->center = (Vector2){ 50.0f, 50.0f };
     ptr->rotation = 0;
     ptr->tint = WHITE;

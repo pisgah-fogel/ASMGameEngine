@@ -15,7 +15,7 @@ typedef struct texture {
     Color tint;
 } texture_t;
 
-void _free_texture(void *arg) {
+void _free_texture(node_base_t *arg) {
     TraceLog(LOG_INFO, "_free_texture");
     texture_t *ptr = ((node_base_t*)arg)->data;
     UnloadTexture(ptr->texture);
@@ -23,12 +23,12 @@ void _free_texture(void *arg) {
     ptr = NULL;
 }
 
-void _render_texture(void *arg) {
+void _render_texture(node_base_t *arg) {
     texture_t *ptr = ((node_base_t*)arg)->data;
     DrawTexture(ptr->texture, ptr->x, ptr->y, ptr->tint);
 }
 
-void _init_texture(void* arg) {
+void _init_texture(node_base_t* arg) {
     ((node_base_t*)arg)->data = malloc(sizeof(texture_t));
     texture_t *ptr = ((node_base_t*)arg)->data;
     ptr->texture = LoadTexture("resources/spritesheet.png");
