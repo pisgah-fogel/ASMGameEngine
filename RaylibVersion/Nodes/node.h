@@ -12,17 +12,19 @@
  * @brief All nodes are converted to this structure before being cast to there original structure
  */
 typedef struct node_base {
-    void* data; // Used by the node system's user to store it's variables...
-    void(*callback_free)(void*);
+    void* data; // Store your datas there, all callbacks get it as parameter
+    void(*callback_free)(void*); // Called to free all resources, do not access the node tree there
     void(*callback_init)(void*); // Called when the node is created
     void(*callback_ready)(void*); // Called once the node is in the tree
     void(*callback_exiting)(void*); // Called just before removing the node from the tree
-    void(*callback_render)(void*);
-    void(*callback_process)(void*);
-    void(*callback_event)(void*);
-    struct node_base* parent;
-    list_t child; // Must be initialized to NULL
+    void(*callback_render)(void*); // Called every frame, draw there
+    void(*callback_process)(void*); // Called before the frame (do your processing / graphics updates there)
+    void(*callback_event)(void*); // Called to handle event
+
+    struct node_base* parent; // The parent node, NULL if it is the 'head' of the node tree
+    list_t child; // Must be initialized to NULL, contains a list of children (nodes too)
     unsigned int child_count;
+    Vector3 position;// Position of the node, by default place it in the center of your node's graphics
     // TODO: Use __attribute__((__packed__)) if there is a problem
     // TODO: add canary to check struct's integrity (-DDEBUG) ?
 } node_base_t;
@@ -42,22 +44,32 @@ void node_add_child(node_base_t *parent, node_base_t *child)
  * 
  * @param ptr pointer to the node
  * 
- * Does not handle NULL pointers yet.
  */
 void node_free(node_base_t *ptr)
 {
+    if (ptr == NULL)
+        return;
+
     if (ptr->callback_exiting)
         (*ptr->callback_exiting)(ptr);
-    
-    // Free all childs
-    element_t* item = ptr->child;
-    while (item != NULL) {
-        node_free(item->data);
-        item = item->next;
-    }
 
+    // Free all childs
+    element_t* child_list_ptr = ptr->child;
+    element_t* child_list_ptr_next = NULL;
+    while (child_list_ptr != NULL) {
+        child_list_ptr_next = child_list_ptr->next; // Childs will remove their entry in their parents, savinf the next one before they do
+        node_free(child_list_ptr->data);
+        child_list_ptr = child_list_ptr_next;
+    }
     // Free the list
     list_clear(&ptr->child);
+    
+    // remove the node from it's parent
+    if (ptr->parent != NULL) {
+        //size_t status = list_remplace((ptr->parent->child), ptr, NULL); // This works too, but leave empty nodes childs in the parent's child list
+        size_t status = list_remove_by_reference(&(ptr->parent->child), ptr);
+        printf("node_free: list_remove_by_reference returned %d\n", status);
+    }
 
     // TODO: handle NULL pointers
     if (ptr->callback_free)

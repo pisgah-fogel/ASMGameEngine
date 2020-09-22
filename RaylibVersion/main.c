@@ -22,6 +22,7 @@
  */
 void UpdateDrawFrame();
 
+// TODO: implement other type of camera movements
 void CameraSmoothFollow(Camera2D *camera, Vector2 target, float delta);
 
 node_base_t *sprite_test;
@@ -41,6 +42,8 @@ int main()
     
     texture_test = create_texture();
     node_add_child(sprite_test, texture_test);
+
+    list_print(sprite_test->child);
 
     node_init(sprite_test);
     node_init(texture_test);

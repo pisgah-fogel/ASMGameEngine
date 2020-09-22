@@ -94,6 +94,24 @@ size_t list_size(const list_t list) {
     return i;
 }
 
+void list_print(const list_t list) {
+    element_t* ptr = list;
+    size_t i = 0;
+    printf("List_print:\n");
+    while(ptr!=NULL) {
+        printf("%d -> @ 0x%x : next:%x, data:%x\n", i,
+            (unsigned int)ptr, (unsigned int)ptr->next,
+            (unsigned int)ptr->data);
+
+        ptr = ptr->next;
+        i++;
+        if (i>50) {
+            printf("... (50+)\n");
+            return;
+        }
+    }
+}
+
 LIST_TYPE list_get(const list_t list, size_t index) {
     element_t* ptr = list;
 
@@ -107,4 +125,69 @@ LIST_TYPE list_get(const list_t list, size_t index) {
     if (ptr == NULL)
         return LIST_NIL; // Empty list
     return ptr->data;
+}
+
+// TODO: Not tested yet
+size_t list_count(const list_t list, LIST_TYPE tocount)
+{
+    element_t* ptr = list;
+    size_t count = 0;
+
+    while (ptr != NULL) {
+        if (ptr->data == tocount)
+            count++;
+        ptr = ptr->next;
+    }
+    return count;
+}
+
+/**
+ * @brief Remplace a value by a new one
+ * 
+ * @param list 
+ * @param oldvalue 
+ * @param newvalue 
+ * @return size_t number of matched values
+ */
+size_t list_remplace(const list_t list, LIST_TYPE oldvalue, LIST_TYPE newvalue)
+{
+    element_t* ptr = list;
+    size_t count = 0;
+
+    while (ptr != NULL) {
+        if (ptr->data == oldvalue) {
+            ptr->data = newvalue;
+            count++;
+        }
+        ptr = ptr->next;
+    }
+    return count;
+}
+
+size_t list_remove_by_reference(list_t* list, LIST_TYPE tobedeleted)
+{
+    element_t* previous = NULL;
+    element_t* ptr = *list;
+    size_t count = 0;
+
+    while (ptr != NULL) {
+        if (ptr->data == tobedeleted) {
+            element_t* tmp = ptr->next;
+            if (previous != NULL)
+                previous->next = tmp;
+            else
+                *list = tmp;
+            free(ptr);
+            // to not return there, there maybe many times the same data... 
+            count++;
+
+            // keep previous
+            ptr = tmp; // ptr no longuer valid here
+        }
+        else {
+            previous = ptr; 
+            ptr = ptr->next;
+        }
+    }
+    return count;
 }
