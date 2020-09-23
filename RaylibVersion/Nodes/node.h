@@ -25,6 +25,9 @@ static constexpr unsigned int consthash(const char* str)
     }
 }
 
+// For performance it's more efficient to store it there than passing it to all functions as argument
+static float delta_process; // Elapsed time between two node_root_process call
+
 /**
  * @brief All nodes are converted to this structure before being cast to there original structure
  */
@@ -36,7 +39,7 @@ typedef struct node_base {
     void(*callback_ready)(struct node_base*) = NULL; // Called once the node is in the tree
     void(*callback_exiting)(struct node_base*) = NULL; // Called just before removing the node from the tree
     void(*callback_render)(struct node_base*) = NULL; // Called every frame, draw there
-    void(*callback_process)(struct node_base*) = NULL; // Called before the frame (do your processing / graphics updates there)
+    void(*callback_process)(struct node_base*, float) = NULL; // Called before the frame (do your processing / graphics updates there)
     void(*callback_event)(struct node_base*) = NULL; // Called to handle event
 
     struct node_base* parent = NULL; // The parent node, NULL if it is the 'head' of the node tree
@@ -141,7 +144,7 @@ void node_recursive_event(node_base_t *ptr)
 void node_process(node_base_t *ptr)
 {
     if (ptr->callback_process)
-        (*ptr->callback_process)(ptr);
+        (*ptr->callback_process)(ptr, delta_process);
 }
 
 void node_recursive_process(node_base_t *ptr)
@@ -237,6 +240,7 @@ void node_root_init() {
 }
 
 void node_root_process() {
+    delta_process = GetFrameTime();
     if (root->head != NULL) {
         node_recursive_process(root->head);
     }

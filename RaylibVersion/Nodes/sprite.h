@@ -33,9 +33,9 @@ void _render_sprite(node_base_t *self) {
     DrawLine(0, (int)ptr->dest.y, 300, (int)ptr->dest.y, GRAY);
 }
 
-void _process_sprite(node_base_t *self) {
+void _process_sprite(node_base_t *self, float dt) {
     sprite_t *ptr = (sprite_t*)self->data;
-    ptr->rotation++;
+    ptr->rotation += (int)(dt * 100);
 }
 
 void _event_sprite(node_base_t *self) {
