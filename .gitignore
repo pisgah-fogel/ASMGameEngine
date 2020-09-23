@@ -61,3 +61,6 @@ CVersion/assets/spritesheet.png~
 RaylibVersion/resources/spritesheet.png~
 CVersion/debug
 POC/debug
+.vscode/launch.json
+.vscode/settings.json
+.vscode/tasks.json
