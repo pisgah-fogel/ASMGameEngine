@@ -4,6 +4,9 @@
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
 #include <bx/bx.h>
+#include "bx/math.h"
+
+#include "cube.h"
 
 /*
  * The the native window (system dependant so...)
@@ -64,6 +67,14 @@ int main(void)
     bgfx::setViewRect(0, 0, 0, uint16_t(800), uint16_t(600));
     // bgfx::frame(); // TODO: Is it needed/better ?
 
+    bgfx::VertexBufferHandle vbh;
+    bgfx::IndexBufferHandle ibh;
+    cube_vertexDeclaration(&vbh, &ibh);
+
+    bgfx::ShaderHandle vsh = loadShader("vs_cubes.bin");
+    bgfx::ShaderHandle fsh = loadShader("fs_cubes.bin");
+    bgfx::ProgramHandle program = bgfx::createProgram(vsh, fsh, true);
+
     bool exit = false;
     SDL_Event event;
     int counter = 0;
@@ -91,12 +102,27 @@ int main(void)
             }
         }
 
-        bgfx::touch(0);
+        //
+        const bx::Vec3 at = {0.0f, 0.0f,  0.0f};
+        const bx::Vec3 eye = {0.0f, 0.0f, -5.0f};
+        float view[16];
+        bx::mtxLookAt(view, eye, at);
+        float proj[16];
+        bx::mtxProj(proj, 60.0f, 800.f/600.f, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
+        bgfx::setViewTransform(0, view, proj);
+
+        bgfx::setVertexBuffer(0, vbh);
+        bgfx::setIndexBuffer(ibh);
+
+        //bgfx::touch(0); // draw an empty primitive
+
+        bgfx::submit(0, program);
+
+        // debug information
         bgfx::dbgTextClear();
         bgfx::dbgTextPrintf(0, 1, 0x4f, "Counter:%d", counter++);
-        bgfx::frame();
 
-        bgfx::renderFrame();
+        bgfx::frame(); // Single threaded: Do rendering, for multithread use bgfx::renderFrame();
     }
 
     bgfx::shutdown();
