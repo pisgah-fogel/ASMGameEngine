@@ -29,16 +29,14 @@ void CameraSmoothFollow(Camera2D *camera, Vector2 target, float delta);
 node_base_t *sprite_test;
 node_base_t *texture_test;
 node_base_t *label_test;
-node_root_t* root;
 
 Camera2D camera = { 0 };
 
 int main()
 {
-    root = node_root_create(800, 800, "Node Test");
-
+    node_root_setup();
     sprite_test = create_sprite();
-    node_root_set_head(root, sprite_test);
+    node_root_set_head(sprite_test);
 
     texture_test = create_texture();
     node_add_child(sprite_test, texture_test);
@@ -49,7 +47,7 @@ int main()
     list_print(sprite_test->childs);
 
     camera.target = (Vector2){0, 0};
-    camera.offset = (Vector2){ (float)root->screenWidth/2, (float)root->screenWidth/2 };
+    camera.offset = (Vector2){ (float)node_get_root()->screenWidth/2, (float)node_get_root()->screenWidth/2 };
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
 
@@ -64,7 +62,7 @@ int main()
     }
 #endif
 
-    node_root_free(&root);
+    node_root_free();
     printf("No segfault\n");
     return 0;
 }
@@ -76,7 +74,7 @@ void UpdateDrawFrame()
 {
     float delta = GetFrameTime();
     // Handle Events
-    node_event(sprite_test);
+    node_root_event();
     cursorPosition = GetMousePosition();
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) cursorColor = MAROON;
     else if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) cursorColor = LIME;
@@ -95,7 +93,7 @@ void UpdateDrawFrame()
 
         BeginMode2D(camera);
 
-        node_root_render(root);
+        node_root_render();
 
         EndMode2D();
 

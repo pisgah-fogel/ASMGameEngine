@@ -7,6 +7,7 @@
 #include "raylib.h"
 
 #include "list.h"
+
 static constexpr unsigned int consthash(const char* str) 
 { 
     if (str != nullptr)
@@ -165,10 +166,11 @@ void node_recursive_render(node_base_t *ptr)
 }
 
 typedef struct node_root {
-    int screenWidth;
-    int screenHeight;
-    node_base_t* head; // First element of the node tree
+    int screenWidth = 800;
+    int screenHeight = 600;
+    node_base_t* head = NULL; // First element of the node tree
 } node_root_t;
+static node_root_t* root = NULL;
 
 node_root_t* node_root_create(int screenWidth, int screenHeight, const char* windowName) {
     InitWindow(screenWidth, screenHeight, windowName);
@@ -179,31 +181,32 @@ node_root_t* node_root_create(int screenWidth, int screenHeight, const char* win
     return ptr;
 }
 
-void node_root_set_head(node_root_t* ptr, node_base_t* head) {
+void node_root_set_head(node_base_t* head) {
+    // TODO: Do something if root-> already set
     node_init(head); // node_add_child is not going to be called on this one, need to call it here
-    ptr->head = head;
+    root->head = head;
     head->parent = NULL; // It's the "head" of the node tree, then it does not have parent
 }
 
-void node_root_free(node_root_t** ptr) {
-    if ((*ptr)->head != NULL)
-        node_free((*ptr)->head);
-    free(*ptr);
-    *ptr = NULL;
+void node_root_free() {
+    if (root->head != NULL)
+        node_free(root->head);
+    free(root);
+    root = NULL;
 
     CloseWindow();
 }
 
-void node_root_render(node_root_t* ptr) {
-    if (ptr->head != NULL) {
+void node_root_render() {
+    if (root != NULL) {
         // Iterate through childs and render them
-        node_recursive_render(ptr->head);
+        node_recursive_render(root->head);
     }
 }
 
-void node_root_event(node_root_t* ptr) {
-    if (ptr->head != NULL) {
-        node_recursive_event(ptr->head);
+void node_root_event() {
+    if (root->head != NULL) {
+        node_recursive_event(root->head);
     }
 }
 
@@ -212,8 +215,30 @@ void node_root_event(node_root_t* ptr) {
  * 
  * @param ptr 
  */
-void node_root_init(node_root_t* ptr) {
-    if (ptr->head != NULL) {
-        node_recursive_init(ptr->head);
+void node_root_init() {
+    if (root->head != NULL) {
+        node_recursive_init(root->head);
+    }
+}
+
+node_root_t* node_get_root(){
+    
+    if (root == NULL)
+    {
+        printf("Warning: node_getRoot, first call, creating it\n");
+        root = node_root_create(800, 800, "Node Test");
+    }
+    return root;
+}
+
+void node_root_setup(){
+    
+    if (root == NULL)
+    {
+        printf("node_root_setup\n");
+        root = node_root_create(800, 800, "Node Test");
+    } else {
+        printf("Error: node_root_setup called twice\n");
+        exit(1);
     }
 }
