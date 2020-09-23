@@ -1,10 +1,10 @@
 #pragma once
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "raylib.h"
-#include "rmem.h"
 
 #include "list.h"
 static constexpr unsigned int consthash(const char* str) 
@@ -91,7 +91,7 @@ void node_free(node_base_t *ptr)
         ptr->parent->child_count--;
         //size_t status = list_remplace((ptr->parent->child), ptr, NULL); // This works too, but leave empty nodes childs in the parent's child list
         size_t status = list_remove_by_reference(&(ptr->parent->child), ptr);
-        printf("node_free: list_remove_by_reference returned %d\n", status);
+        printf("node_free: list_remove_by_reference returned %zu\n", status);
     }
 
     // TODO: handle NULL pointers

@@ -170,7 +170,8 @@ ifeq ($(PLATFORM),PLATFORM_WEB)
     # HTML5 emscripten compiler
     # WARNING: To compile to HTML5, code must be redesigned 
     # to use emscripten.h and emscripten_set_main_loop()
-    CC = emcc
+    #CC = emcc # C
+    CC = em++ # C++
 endif
 
 # Define default make program: Mingw32-make
