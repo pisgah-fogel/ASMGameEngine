@@ -35,6 +35,7 @@ Camera2D camera = { 0 };
 int main()
 {
     node_root_setup();
+
     sprite_test = create_sprite();
     node_root_set_head(sprite_test);
 

@@ -222,17 +222,10 @@ void node_root_init() {
 }
 
 node_root_t* node_get_root(){
-    
-    if (root == NULL)
-    {
-        printf("Warning: node_getRoot, first call, creating it\n");
-        root = node_root_create(800, 800, "Node Test");
-    }
     return root;
 }
 
 void node_root_setup(){
-    
     if (root == NULL)
     {
         printf("node_root_setup\n");
