@@ -28,21 +28,19 @@ static constexpr unsigned int consthash(const char* str)
  * @brief All nodes are converted to this structure before being cast to there original structure
  */
 typedef struct node_base {
-    unsigned int id;
-    void* data; // Store your datas there, all callbacks get it as parameter
-    void(*callback_free)(struct node_base*); // Called to free all resources, do not access the node tree there
-    void(*callback_init)(struct node_base*); // Called when the node is created
-    void(*callback_ready)(struct node_base*); // Called once the node is in the tree
-    void(*callback_exiting)(struct node_base*); // Called just before removing the node from the tree
-    void(*callback_render)(struct node_base*); // Called every frame, draw there
-    void(*callback_process)(struct node_base*); // Called before the frame (do your processing / graphics updates there)
-    void(*callback_event)(struct node_base*); // Called to handle event
+    unsigned int id = 0;
+    void* data = NULL; // Store your datas there, all callbacks get it as parameter
+    void(*callback_free)(struct node_base*) = NULL; // Called to free all resources, do not access the node tree there
+    void(*callback_init)(struct node_base*) = NULL; // Called when the node is created
+    void(*callback_ready)(struct node_base*) = NULL; // Called once the node is in the tree
+    void(*callback_exiting)(struct node_base*) = NULL; // Called just before removing the node from the tree
+    void(*callback_render)(struct node_base*) = NULL; // Called every frame, draw there
+    void(*callback_process)(struct node_base*) = NULL; // Called before the frame (do your processing / graphics updates there)
+    void(*callback_event)(struct node_base*) = NULL; // Called to handle event
 
-    struct node_base* parent; // The parent node, NULL if it is the 'head' of the node tree
-    list_t child; // Must be initialized to NULL, contains a list of children (nodes too)
-    unsigned int child_count;
-    // TODO: Use __attribute__((__packed__)) if there is a problem
-    // TODO: add canary to check struct's integrity (-DDEBUG) ?
+    struct node_base* parent = NULL; // The parent node, NULL if it is the 'head' of the node tree
+    list_t child = NULL; // Must be initialized to NULL, contains a list of children (nodes too)
+    unsigned int child_count = 0;
 } node_base_t;
 
 void node_init(node_base_t *ptr)

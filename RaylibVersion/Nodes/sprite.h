@@ -60,18 +60,13 @@ void _init_sprite(node_base_t *self) {
 
 static node_base_t* create_sprite() {
     node_base_t* sprite_test = (node_base_t*)malloc(sizeof(node_base_t));
+    *sprite_test = (node_base_t){};
     sprite_test->id = consthash("sprite_test_1");
-    printf("Sprite test id: %d\n", sprite_test->id);
+    printf("Sprite test id: %u\n", sprite_test->id);
     sprite_test->callback_free = &_free_sprite;
     sprite_test->callback_render = &_render_sprite;
     sprite_test->callback_process = &_process_sprite;
     sprite_test->callback_event = &_event_sprite;
     sprite_test->callback_init = &_init_sprite;
-    sprite_test->callback_ready = NULL;
-    sprite_test->callback_exiting = NULL;
-    sprite_test->data = NULL;
-    sprite_test->parent = NULL;
-    sprite_test->child = NULL;
-    sprite_test->child_count = 0;
     return sprite_test;
 }
