@@ -111,6 +111,10 @@ int main(void)
         bx::mtxProj(proj, 60.0f, 800.f/600.f, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
         bgfx::setViewTransform(0, view, proj);
 
+        float mtx[16];
+        bx::mtxRotateXY(mtx, counter * 0.01f, counter * 0.01f);
+        bgfx::setTransform(mtx);        
+
         bgfx::setVertexBuffer(0, vbh);
         bgfx::setIndexBuffer(ibh);
 
