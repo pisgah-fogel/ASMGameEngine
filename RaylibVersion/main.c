@@ -81,8 +81,7 @@ void UpdateDrawFrame()
     else if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) cursorColor = LIME;
     else if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) cursorColor = DARKBLUE;
 
-    // TODO: call _process on each node
-    node_process(sprite_test);
+    node_root_process();
 
     // TODO: run physic engine
 

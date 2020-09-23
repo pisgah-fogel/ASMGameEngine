@@ -144,6 +144,21 @@ void node_process(node_base_t *ptr)
         (*ptr->callback_process)(ptr);
 }
 
+void node_recursive_process(node_base_t *ptr)
+{
+    node_process(ptr);
+    
+    // Iterate through childs and render them
+    element_t* it;
+    element_t* it_next = ptr->childs;
+    while(it_next != NULL) {
+        it = it_next;
+        it_next = it->next;
+        if (it->data != NULL)
+            node_recursive_process(it->data);
+    }
+}
+
 void node_render(node_base_t *ptr)
 {
     if (ptr->callback_render)
@@ -218,6 +233,12 @@ void node_root_event() {
 void node_root_init() {
     if (root->head != NULL) {
         node_recursive_init(root->head);
+    }
+}
+
+void node_root_process() {
+    if (root->head != NULL) {
+        node_recursive_process(root->head);
     }
 }
 
