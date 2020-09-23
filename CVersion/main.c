@@ -18,17 +18,32 @@ Uint32 win_format = -1; // Window's optimal pixel format
 void initSDL()
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { 
-        printf("Error initializing SDL: %s\n", SDL_GetError()); 
+        printf("Error SDL_Init failed: %s\n", SDL_GetError()); 
+        exit(1);
     } 
     win = SDL_CreateWindow(WIN_NAME, 
         SDL_WINDOWPOS_CENTERED, 
         SDL_WINDOWPOS_CENTERED, 
         WIN_X, WIN_Y, 0);
+    if (!win) {
+        printf("Error: SDL_CreateWindow failed: %s\n", SDL_GetError());
+        exit(1);
+    }
     
     rend = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (!rend) {
+        printf("Error: SDL_CreateRenderer failed: %s\n", SDL_GetError());
+        exit(1);
+    }
 
     // Get window's optimal pixel format
     SDL_Surface* windowSurface = SDL_GetWindowSurface(win);
+    if (!windowSurface) {
+        printf("Error: SDL_GetWindowSurface failed: %s\n", SDL_GetError());
+
+        printf("Sorry no alternative yet, check if a driver is missing for your hardware.\n");
+        exit(1); // TODO: if error is "No hardware accelerated" use an alternative
+    }
     win_format = windowSurface->format->format;
 }
 void freeSDL()
