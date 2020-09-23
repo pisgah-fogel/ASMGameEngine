@@ -46,7 +46,7 @@ int main()
     label_test = create_label();
     node_add_child(sprite_test, label_test);
 
-    list_print(sprite_test->child);
+    list_print(sprite_test->childs);
 
     camera.target = (Vector2){0, 0};
     camera.offset = (Vector2){ (float)root->screenWidth/2, (float)root->screenWidth/2 };

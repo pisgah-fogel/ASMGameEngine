@@ -39,7 +39,7 @@ typedef struct node_base {
     void(*callback_event)(struct node_base*) = NULL; // Called to handle event
 
     struct node_base* parent = NULL; // The parent node, NULL if it is the 'head' of the node tree
-    list_t child = NULL; // Must be initialized to NULL, contains a list of children (nodes too)
+    list_t childs = NULL; // Must be initialized to NULL, contains a list of children (nodes too)
     unsigned int child_count = 0;
 } node_base_t;
 
@@ -52,7 +52,7 @@ void node_init(node_base_t *ptr)
 void node_add_child(node_base_t *parent, node_base_t *child)
 {
     node_init(child);
-    list_append(&parent->child, child);
+    list_append(&parent->childs, child);
     child->parent = parent;
     parent->child_count++;
 
@@ -76,7 +76,7 @@ void node_free(node_base_t *ptr)
         (*ptr->callback_exiting)(ptr);
 
     // Free all childs
-    element_t* child_list_ptr = ptr->child;
+    element_t* child_list_ptr = ptr->childs;
     element_t* child_list_ptr_next = NULL;
     while (child_list_ptr != NULL) {
         child_list_ptr_next = child_list_ptr->next; // Childs will remove their entry in their parents, savinf the next one before they do
@@ -84,13 +84,13 @@ void node_free(node_base_t *ptr)
         child_list_ptr = child_list_ptr_next;
     }
     // Free the list
-    list_clear(&ptr->child);
+    list_clear(&ptr->childs);
     
     // remove the node from it's parent
     if (ptr->parent != NULL) {
         ptr->parent->child_count--;
-        //size_t status = list_remplace((ptr->parent->child), ptr, NULL); // This works too, but leave empty nodes childs in the parent's child list
-        size_t status = list_remove_by_reference(&(ptr->parent->child), ptr);
+        //size_t status = list_remplace((ptr->parent->childs), ptr, NULL); // This works too, but leave empty nodes childs in the parent's childs list
+        size_t status = list_remove_by_reference(&(ptr->parent->childs), ptr);
         printf("node_free: list_remove_by_reference returned %zu\n", status);
     }
 
@@ -107,7 +107,7 @@ void node_recursive_init(node_base_t *ptr)
     
     // Iterate through childs
     element_t* it;
-    element_t* it_next = ptr->child;
+    element_t* it_next = ptr->childs;
     while(it_next != NULL) {
         it = it_next;
         it_next = it->next;
@@ -128,7 +128,7 @@ void node_recursive_event(node_base_t *ptr)
     
     // Iterate through childs
     element_t* it;
-    element_t* it_next = ptr->child;
+    element_t* it_next = ptr->childs;
     while(it_next != NULL) {
         it = it_next;
         it_next = it->next;
@@ -155,7 +155,7 @@ void node_recursive_render(node_base_t *ptr)
     
     // Iterate through childs and render them
     element_t* it;
-    element_t* it_next = ptr->child;
+    element_t* it_next = ptr->childs;
     while(it_next != NULL) {
         it = it_next;
         it_next = it->next;

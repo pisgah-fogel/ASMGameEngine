@@ -27,10 +27,11 @@ void _render_label(node_base_t *self) {
     DrawText(ptr->text, ptr->position.x, ptr->position.y, ptr->fontsize, ptr->color);
 }
 
+char default_test[] = "This is an awesome test Label";
 void _init_label(node_base_t *self) {
     self->data = malloc(sizeof(label_t));
     label_t *ptr = (label_t*)self->data;
-    ptr->text = "This is an awesome test Label";
+    ptr->text = default_test;
     ptr->needToFreeText = false;
     ptr->color = LIGHTGRAY;
     ptr->fontsize = 30;
