@@ -101,9 +101,6 @@ int main(void)
 
     bgfx::shutdown();
 
-    //while (bgfx::RenderFrame::NoContext != bgfx::renderFrame()) {
-    //};
-
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
