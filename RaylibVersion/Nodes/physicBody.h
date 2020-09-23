@@ -21,7 +21,7 @@ void _render_physicBody(node_base_t *self) {
     physicBody_t *ptr = (physicBody_t*)self->data;
     //ptr->circle->position.x
     //ptr->circle->position.y
-    ptr->circle->velocity.x = 10.f;
+    if (IsKeyDown(KEY_A)) ptr->circle->enabled = true;
     int vertexCount = ptr->circle->shape.vertexData.vertexCount;
     for (int j = 0; j < vertexCount; j++)
     {
@@ -38,7 +38,7 @@ void _init_physicBody(node_base_t *self) {
     self->data = malloc(sizeof(physicBody_t));
     physicBody_t *ptr = (physicBody_t*)self->data;
 
-    ptr->circle = CreatePhysicsBodyCircle((Vector2){ 200, 200 }, 45, 10);
+    ptr->circle = CreatePhysicsBodyCircle((Vector2){ 200, -400 }, 45, 1);
     ptr->circle->enabled = false;
 }
 
