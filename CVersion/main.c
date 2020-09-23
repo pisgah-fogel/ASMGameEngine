@@ -2,7 +2,17 @@
 #include <SDL2/SDL.h> 
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
+
+// Required for physics
 #include <chipmunk/chipmunk.h>
+
+// Required for GPU
+#include <SDL2/SDL_syswm.h>
+#include <bgfx/bgfx.h>
+#include <bgfx/platform.h>
+#include <bx/bx.h>
+#include <bx/mutex.h>
+#include <bx/thread.h>
 
 #include "Sprite.h"
 
