@@ -40,7 +40,7 @@ void _init_label(node_base_t *self) {
 
 static node_base_t* create_label() {
     node_base_t* label_test = (node_base_t*)malloc(sizeof(node_base_t));
-    *label_test = (node_base_t){};
+    *label_test = node_base_t_default;
     label_test->id = consthash("label_test_1");
     printf("Label test id: %u\n", label_test->id);
     label_test->callback_free = &_free_label;

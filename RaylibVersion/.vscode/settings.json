@@ -7,5 +7,23 @@
 		"**/.DS_Store": true,
 		"**/*.o": true,
 		"**/*.exe": true,
+	},
+	"files.associations": {
+		"atomic": "cpp",
+		"*.tcc": "cpp",
+		"deque": "cpp",
+		"string": "cpp",
+		"unordered_map": "cpp",
+		"vector": "cpp",
+		"memory_resource": "cpp",
+		"optional": "cpp",
+		"string_view": "cpp",
+		"fstream": "cpp",
+		"istream": "cpp",
+		"ostream": "cpp",
+		"sstream": "cpp",
+		"streambuf": "cpp",
+		"system_error": "cpp",
+		"tuple": "cpp"
 	}
 }

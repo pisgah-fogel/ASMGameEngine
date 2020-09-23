@@ -147,7 +147,7 @@ EXAMPLE_RUNTIME_PATH   ?= $(RAYLIB_RELEASE_PATH)
 
 # Define default C compiler: gcc
 # NOTE: define g++ compiler if using C++
-CC = g++
+CC = gcc
 
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
     ifeq ($(PLATFORM_OS),OSX)
@@ -170,8 +170,8 @@ ifeq ($(PLATFORM),PLATFORM_WEB)
     # HTML5 emscripten compiler
     # WARNING: To compile to HTML5, code must be redesigned 
     # to use emscripten.h and emscripten_set_main_loop()
-    #CC = emcc # C
-    CC = em++ # C++
+    CC = emcc # C
+    #CC = em++ # C++
 endif
 
 # Define default make program: Mingw32-make
@@ -308,7 +308,7 @@ ifeq ($(PLATFORM),PLATFORM_DESKTOP)
         # NOTE: WinMM library required to set high-res timer resolution
         LDLIBS = -lraylib -lopengl32 -lgdi32 -lwinmm
         # Required for physac examples
-        #LDLIBS += -static -lpthread
+        LDLIBS += -static -lpthread -lkernel32
     endif
     ifeq ($(PLATFORM_OS),LINUX)
         # Libraries for Debian GNU/Linux desktop compiling

@@ -99,7 +99,7 @@ void list_print(const list_t list) {
     size_t i = 0;
     printf("List_print:\n");
     while(ptr!=NULL) {
-        printf("%zu -> @ 0x%x : next:%x, data:%x\n", i,
+        printf("%u -> @ 0x%x : next:%x, data:%x\n", i,
             (unsigned int)ptr, (unsigned int)ptr->next,
             (unsigned int)ptr->data);
 

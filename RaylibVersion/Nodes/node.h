@@ -6,8 +6,22 @@
 
 #include "raylib.h"
 
+// include OS specific timing library 
+#include "time.h"
+#ifdef _MSC_VER // Windows 
+#include <Windows.h>
+#include <profileapi.h>
+#else // Linux 
+#include <time.h>
+#endif
+
+#define PHYSAC_IMPLEMENTATION
+#define PHYSAC_NO_THREADS
+#include "physac.h"
+
 #include "list.h"
 
+#if __cplusplus > 199711L
 static constexpr unsigned int consthash(const char* str) 
 { 
     if (str != nullptr)
@@ -24,6 +38,10 @@ static constexpr unsigned int consthash(const char* str)
         return 0;
     }
 }
+#else
+#define consthash(...) __COUNTER__
+#endif
+
 
 // For performance it's more efficient to store it there than passing it to all functions as argument
 static float delta_process; // Elapsed time between two node_root_process call
@@ -32,20 +50,35 @@ static float delta_process; // Elapsed time between two node_root_process call
  * @brief All nodes are converted to this structure before being cast to there original structure
  */
 typedef struct node_base {
-    unsigned int id = 0;
-    void* data = NULL; // Store your datas there, all callbacks get it as parameter
-    void(*callback_free)(struct node_base*) = NULL; // Called to free all resources, do not access the node tree there
-    void(*callback_init)(struct node_base*) = NULL; // Called when the node is created
-    void(*callback_ready)(struct node_base*) = NULL; // Called once the node is in the tree
-    void(*callback_exiting)(struct node_base*) = NULL; // Called just before removing the node from the tree
-    void(*callback_render)(struct node_base*) = NULL; // Called every frame, draw there
-    void(*callback_process)(struct node_base*, float) = NULL; // Called before the frame (do your processing / graphics updates there)
-    void(*callback_event)(struct node_base*) = NULL; // Called to handle event
+    unsigned int id;
+    void* data; // Store your datas there, all callbacks get it as parameter
+    void(*callback_free)(struct node_base*); // Called to free all resources, do not access the node tree there
+    void(*callback_init)(struct node_base*); // Called when the node is created
+    void(*callback_ready)(struct node_base*); // Called once the node is in the tree
+    void(*callback_exiting)(struct node_base*); // Called just before removing the node from the tree
+    void(*callback_render)(struct node_base*); // Called every frame, draw there
+    void(*callback_process)(struct node_base*, float); // Called before the frame (do your processing / graphics updates there)
+    void(*callback_event)(struct node_base*); // Called to handle event
 
-    struct node_base* parent = NULL; // The parent node, NULL if it is the 'head' of the node tree
-    list_t childs = NULL; // Must be initialized to NULL, contains a list of children (nodes too)
-    unsigned int child_count = 0;
+    struct node_base* parent; // The parent node, NULL if it is the 'head' of the node tree
+    list_t childs; // Must be initialized to NULL, contains a list of children (nodes too)
+    unsigned int child_count;
 } node_base_t;
+
+node_base_t node_base_t_default = {
+    0, // id
+    NULL, // data
+    NULL, // callback_free
+    NULL, // callback_init
+    NULL, // callback_ready
+    NULL, // callback_exiting
+    NULL, // callback_render
+    NULL, // callback_process
+    NULL, // callback_event
+    NULL, // node_base
+    NULL, // childs
+    0 // child_count
+};
 
 void node_init(node_base_t *ptr)
 {
@@ -95,7 +128,7 @@ void node_free(node_base_t *ptr)
         ptr->parent->child_count--;
         //size_t status = list_remplace((ptr->parent->childs), ptr, NULL); // This works too, but leave empty nodes childs in the parent's childs list
         size_t status = list_remove_by_reference(&(ptr->parent->childs), ptr);
-        printf("node_free: list_remove_by_reference returned %zu\n", status);
+        printf("node_free: list_remove_by_reference returned %u\n", status);
     }
 
     // TODO: handle NULL pointers
@@ -184,14 +217,16 @@ void node_recursive_render(node_base_t *ptr)
 }
 
 typedef struct node_root {
-    int screenWidth = 800;
-    int screenHeight = 600;
-    node_base_t* head = NULL; // First element of the node tree
+    int screenWidth;
+    int screenHeight;
+    node_base_t* head; // First element of the node tree
 } node_root_t;
 static node_root_t* root = NULL;
 
 node_root_t* node_root_create(int screenWidth, int screenHeight, const char* windowName) {
+    SetConfigFlags(FLAG_MSAA_4X_HINT); // TODO: Required for Physics ?
     InitWindow(screenWidth, screenHeight, windowName);
+    InitPhysics();
     node_root_t* ptr = (node_root_t*)malloc(sizeof(node_root_t));
     ptr->screenHeight = screenHeight;
     ptr->screenWidth = screenWidth;
@@ -212,6 +247,7 @@ void node_root_free() {
     free(root);
     root = NULL;
 
+    ClosePhysics();
     CloseWindow();
 }
 
@@ -241,6 +277,7 @@ void node_root_init() {
 
 void node_root_process() {
     delta_process = GetFrameTime();
+    RunPhysicsStep(); // TODO: move it to node_root_physicprocess
     if (root->head != NULL) {
         node_recursive_process(root->head);
     }

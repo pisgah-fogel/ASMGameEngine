@@ -60,7 +60,7 @@ void _init_sprite(node_base_t *self) {
 
 static node_base_t* create_sprite() {
     node_base_t* sprite_test = (node_base_t*)malloc(sizeof(node_base_t));
-    *sprite_test = (node_base_t){};
+    *sprite_test = node_base_t_default;
     sprite_test->id = consthash("sprite_test_1");
     printf("Sprite test id: %u\n", sprite_test->id);
     sprite_test->callback_free = &_free_sprite;

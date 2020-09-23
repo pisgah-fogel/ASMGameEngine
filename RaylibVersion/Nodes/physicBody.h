@@ -6,6 +6,7 @@
 #include "Nodes/node.h"
 
 typedef struct physicBody {
+    PhysicsBody circle;
 } physicBody_t;
 
 void _free_physicBody(node_base_t *self) {
@@ -18,18 +19,32 @@ void _free_physicBody(node_base_t *self) {
 
 void _render_physicBody(node_base_t *self) {
     physicBody_t *ptr = (physicBody_t*)self->data;
-    // TODO: draw here
+    //ptr->circle->position.x
+    //ptr->circle->position.y
+    ptr->circle->velocity.x = 10.f;
+    int vertexCount = ptr->circle->shape.vertexData.vertexCount;
+    for (int j = 0; j < vertexCount; j++)
+    {
+        // Get physics bodies shape vertices to draw lines
+        // Note: GetPhysicsShapeVertex() already calculates rotation transformations
+        Vector2 vertexA = GetPhysicsShapeVertex(ptr->circle, j);
+        int jj = (((j + 1) < vertexCount) ? (j + 1) : 0);   // Get next vertex or first to close the shape
+        Vector2 vertexB = GetPhysicsShapeVertex(ptr->circle, jj);
+        DrawLineV(vertexA, vertexB, GREEN);     // Draw a line between two vertex positions
+    }
 }
 
 void _init_physicBody(node_base_t *self) {
     self->data = malloc(sizeof(physicBody_t));
     physicBody_t *ptr = (physicBody_t*)self->data;
-    // TODO: init
+
+    ptr->circle = CreatePhysicsBodyCircle((Vector2){ 200, 200 }, 45, 10);
+    ptr->circle->enabled = false;
 }
 
 static node_base_t* create_physicBody() {
     node_base_t* physicBody_test = (node_base_t*)malloc(sizeof(node_base_t));
-    *physicBody_test = (node_base_t){};
+    *physicBody_test = node_base_t_default;
     physicBody_test->id = consthash("physicBody_test_1");
     printf("physicBody test id: %u\n", physicBody_test->id);
     physicBody_test->callback_free = &_free_physicBody;

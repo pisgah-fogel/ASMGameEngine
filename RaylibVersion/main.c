@@ -11,6 +11,7 @@
 #include "Nodes/sprite.h"
 #include "Nodes/texture.h"
 #include "Nodes/label.h"
+#include "Nodes/physicBody.h"
 
 // #define PLATFORM_WEB
 
@@ -29,6 +30,7 @@ void CameraSmoothFollow(Camera2D *camera, Vector2 target, float delta);
 node_base_t *sprite_test;
 node_base_t *texture_test;
 node_base_t *label_test;
+node_base_t *physicBody_test;
 
 Camera2D camera = { 0 };
 
@@ -44,6 +46,9 @@ int main()
 
     label_test = create_label();
     node_add_child(sprite_test, label_test);
+
+    physicBody_test = create_physicBody();
+    node_add_child(sprite_test, physicBody_test);
 
     list_print(sprite_test->childs);
 
