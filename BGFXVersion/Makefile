@@ -1,4 +1,4 @@
-SOURCES = main.c
+SOURCES = bgfxmain.cpp
 SDL_LINKER_OPT = -lSDL2main -lSDL2 -lSDL2_image
 CHIPMUNK_LINKER_OPT = -lchipmunk
 BGFX_LINKER_OPT = -lbgfx-shared-libDebug
