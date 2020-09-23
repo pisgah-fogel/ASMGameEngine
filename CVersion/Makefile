@@ -21,7 +21,8 @@ ifeq ($(OS),Windows_NT)
     endif
 else
 	SDL_INCLUDE = /usr/include/SDL2
-    CHIPMUNK_INCLUDE = /usr/include/chipmunk
+    CHIPMUNK_LIB = -L"/usr/local/lib/"
+    CHIPMUNK_INCLUDE = /usr/local/include/chipmunk/
     UNAME_S := $(shell uname -s)
     ifeq ($(UNAME_S),Linux)
         CCFLAGS += -D LINUX
