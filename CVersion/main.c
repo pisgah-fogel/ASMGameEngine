@@ -6,17 +6,7 @@
 // Required for physics
 #include <chipmunk/chipmunk.h>
 
-// Required for GPU
-#include <SDL2/SDL_syswm.h>
-#include <bgfx/bgfx.h>
-#include <bgfx/platform.h>
-#include <bx/bx.h>
-#include <bx/mutex.h>
-#include <bx/thread.h>
-
 #include "Sprite.h"
-
-#define ERROR_HANDLING
 
 #define WIN_X 800
 #define WIN_Y 600
