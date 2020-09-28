@@ -55,7 +55,7 @@ void freeSDL()
 
 void UpdateDrawFrame();
 struct Sprite* mSprite;
-int close = 0;
+int mainLoopClose = 0;
 
 int main(int argc, char **argv)
 {
@@ -67,9 +67,8 @@ int main(int argc, char **argv)
     #warning "Building for EMSCRIPTEN"
     emscripten_set_main_loop(UpdateDrawFrame, 0, 1); // Web platforms does not like never endind loops
 #else
-    SetTargetFPS(60);
     // Main Game Loop
-    while (!close) // Detect window close button or ESC key
+    while (!mainLoopClose) // Detect window close button or ESC key
     {
         UpdateDrawFrame();
     }
@@ -86,7 +85,7 @@ void UpdateDrawFrame()
     while(SDL_PollEvent(&event)) {
         switch (event.type) {
             case SDL_QUIT:
-                close = 1;
+                mainLoopClose = 1;
                 break;
             case SDL_KEYDOWN: 
                 switch (event.key.keysym.scancode) { 
