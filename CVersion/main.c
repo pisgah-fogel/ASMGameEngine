@@ -3,8 +3,9 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
 
-// Required for physics
-#include <chipmunk/chipmunk.h>
+#if defined(EMSCRIPTEN)
+    #include <emscripten/emscripten.h>
+#endif
 
 #include "Sprite.h"
 
@@ -17,7 +18,7 @@ SDL_Renderer* rend = NULL;
 Uint32 win_format = -1; // Window's optimal pixel format
 void initSDL()
 {
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { 
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) { 
         printf("Error SDL_Init failed: %s\n", SDL_GetError()); 
         exit(1);
     } 
@@ -52,45 +53,61 @@ void freeSDL()
     SDL_DestroyWindow(win);
 }
 
+void UpdateDrawFrame();
+struct Sprite* mSprite;
+int close = 0;
+
 int main(int argc, char **argv)
 {
     initSDL();
 
-    struct Sprite* mSprite = initSprite(rend);
+    mSprite = initSprite(rend);
 
-    int close = 0;
-    while (!close) {
-        SDL_Event event;
-        while(SDL_PollEvent(&event)) {
-            switch (event.type) {
-                case SDL_QUIT:
-                    close = 1;
-                    break;
-                case SDL_KEYDOWN: 
-                    switch (event.key.keysym.scancode) { 
-                        case SDL_SCANCODE_A: 
-                        case SDL_SCANCODE_LEFT: 
-                            //dest.x -= speed; 
-                            break; 
-                        case SDL_SCANCODE_D: 
-                        case SDL_SCANCODE_RIGHT: 
-                            //dest.x += speed; 
-                            break; 
-                    }
-                    break;
-            }
-        }
-
-        SDL_SetRenderDrawColor( rend, 0x00, 0x00, 0x00, 0xFF );  
-        SDL_RenderClear(rend);
-
-        renderSprite(rend, mSprite);
-
-        SDL_RenderPresent(rend);
-        SDL_Delay(1000 / 60);
+#if defined(EMSCRIPTEN)
+    #warning "Building for EMSCRIPTEN"
+    emscripten_set_main_loop(UpdateDrawFrame, 0, 1); // Web platforms does not like never endind loops
+#else
+    SetTargetFPS(60);
+    // Main Game Loop
+    while (!close) // Detect window close button or ESC key
+    {
+        UpdateDrawFrame();
     }
+#endif
 
     freeSprite(mSprite);
     freeSDL();
     return 0;
+}
+
+void UpdateDrawFrame()
+{
+    SDL_Event event;
+    while(SDL_PollEvent(&event)) {
+        switch (event.type) {
+            case SDL_QUIT:
+                close = 1;
+                break;
+            case SDL_KEYDOWN: 
+                switch (event.key.keysym.scancode) { 
+                    case SDL_SCANCODE_A: 
+                    case SDL_SCANCODE_LEFT: 
+                        //dest.x -= speed; 
+                        break; 
+                    case SDL_SCANCODE_D: 
+                    case SDL_SCANCODE_RIGHT: 
+                        //dest.x += speed; 
+                        break; 
+                }
+                break;
+        }
+    }
+
+    SDL_SetRenderDrawColor( rend, 0x00, 0x00, 0x00, 0xFF );  
+    SDL_RenderClear(rend);
+
+    renderSprite(rend, mSprite);
+
+    SDL_RenderPresent(rend);
+    SDL_Delay(1000 / 60);
 }
